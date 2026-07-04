@@ -124,92 +124,11 @@ export default function App() {
     });
   };
 
-  const startGame = () => {
-    if (!window.confirm('Start the game now? All players in lobby will be locked in.')) return;
-    const q = QUESTIONS[0];
-    const newPlayers = { ...gameState.players };
-    Object.values(newPlayers).forEach(p => {
-      p.alive = true; p.lives = 3; p.score = 0; p.streak = 0;
-    });
-
-    update(ref(db, 'gameState'), {
-      phase: 'question',
-      gameStarted: true,
-      qIndex: 0,
-      currentQData: q,
-      answered: {},
-      round: 1,
-      roundHistory: [],
-      players: newPlayers,
-      timestamp: Date.now()
-    }).then(() => alert('Game started! Round 1 is live.'));
-  };
-
-  const nextQuestion = () => {
-    const qIndex = gameState.qIndex || 0;
-    const q = QUESTIONS[qIndex];
-    if (!q) return;
-
-    const answered = Object.values(gameState.answered || {});
-    const correct = answered.filter(a => a.idx === q.ans).length;
-    const wrong = answered.length - correct;
-    const hist = [...(gameState.roundHistory || []), { icon: q.icon, type: q.type, q: q.q, correct, wrong }];
-
-    const players = { ...gameState.players };
-    Object.keys(players).forEach(name => {
-      if (!players[name].alive) return;
-      const a = gameState.answered?.[name];
-      if (!a || a.idx !== q.ans) {
-        players[name].lives = (players[name].lives || 3) - 1;
-        if (players[name].lives <= 0) players[name].alive = false;
-      } else {
-        players[name].score = (players[name].score || 0) + 100;
-        players[name].streak = (players[name].streak || 0) + 1;
-      }
-    });
-
-    update(ref(db, 'gameState'), {
-      phase: 'showAnswer',
-      correctAnswer: q.ans,
-      currentQData: q,
-      players,
-      roundHistory: hist,
-      timestamp: Date.now()
-    });
-    
-    setTimeout(() => {
-      const nextIdx = qIndex + 1;
-      if (nextIdx >= QUESTIONS.length) {
-        alert('All questions done!');
-        return;
-      }
-      const nextQ = QUESTIONS[nextIdx];
-      update(ref(db, 'gameState'), {
-        phase: 'question',
-        qIndex: nextIdx,
-        currentQData: nextQ,
-        answered: {},
-        round: nextQ.round,
-        players,
-        roundHistory: hist,
-        timestamp: Date.now()
-      });
-    }, 3000);
-  };
-
-  const showAd = () => {
-    update(ref(db, 'gameState'), { phase: 'ad', timestamp: Date.now() });
-  };
-
-  const declareWinner = () => {
-    update(ref(db, 'gameState'), { phase: 'winner', timestamp: Date.now() });
-  };
-
   const resetGame = () => {
-    if (!window.confirm('Reset game to lobby?')) return;
+    if (!window.confirm('Reset all game scores and community poem?')) return;
     update(ref(db, 'gameState'), {
-      phase: 'lobby',
-      gameStarted: false,
+      players: null,
+      communityPoem: null,
       timestamp: Date.now()
     });
   };
@@ -333,24 +252,85 @@ export default function App() {
         </section>
 
         <section className="card">
-          <h2>Game Master Control</h2>
-          <p>Current Phase: <strong style={{textTransform:'capitalize'}}>{gamePhase}</strong></p>
-          <div className="btn-group" style={{ flexWrap: 'wrap' }}>
+          <h2>Arena & Game Availability</h2>
+          <div className="btn-group" style={{ flexWrap: 'wrap', marginBottom: '15px' }}>
             <button onClick={toggleArena} style={{ background: gameState.arenaOpen ? '#E8386D' : '#2EBB5A', color: 'white', border: 'none', borderRadius: '4px', padding: '8px 16px', cursor: 'pointer', fontWeight: 'bold' }}>
               {gameState.arenaOpen ? 'Close Arena' : 'Open Arena'}
             </button>
-            <button onClick={startGame} className="btn-primary" disabled={gameState.gameStarted}>Start Game</button>
-            <button onClick={nextQuestion} className="btn-primary" disabled={!gameState.gameStarted || gamePhase === 'lobby'}>Reveal & Next Question</button>
-            <button onClick={showAd} className="btn-primary" disabled={!gameState.gameStarted}>Show Ad</button>
-            <button onClick={declareWinner} className="btn-primary" disabled={!gameState.gameStarted}>Declare Winner</button>
-            <button onClick={resetGame} style={{ background: '#E8386D', color: 'white', border: 'none', borderRadius: '4px', padding: '8px 16px', cursor: 'pointer' }}>Reset Game</button>
+            <button onClick={resetGame} style={{ background: '#E8386D', color: 'white', border: 'none', borderRadius: '4px', padding: '8px 16px', cursor: 'pointer' }}>Reset Games & Scores</button>
           </div>
-          {gameState.gameStarted && (
-            <div style={{ marginTop: '15px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-              <p style={{margin: '0 0 5px 0'}}><strong>Round:</strong> {gameState.round} | <strong>Question:</strong> {(gameState.qIndex || 0) + 1} / {QUESTIONS.length}</p>
-              <p style={{margin: '0'}}><strong>Alive Players:</strong> {Object.values(gameState.players || {}).filter(p => p.alive).length} / {Object.values(gameState.players || {}).length}</p>
+          
+          <div style={{ padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+            <h3 style={{marginTop: 0, marginBottom: '10px', fontSize: '16px'}}>Toggle Games (Visible to Players)</h3>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {[
+                { id: 'trivia', label: 'Paint by Trivia' },
+                { id: 'emoji', label: 'Emoji Charades' },
+                { id: 'rhyme', label: 'Rhyme Time' },
+                { id: 'fastest', label: 'Fastest Finger' },
+                { id: 'poem', label: 'Community Poem' }
+              ].map(game => {
+                const isEnabled = gameState.availableGames?.[game.id] || false;
+                return (
+                  <button 
+                    key={game.id}
+                    onClick={() => {
+                      update(ref(db, 'gameState/availableGames'), {
+                        [game.id]: !isEnabled
+                      });
+                    }}
+                    style={{
+                      background: isEnabled ? '#2EBB5A' : '#555',
+                      color: 'white',
+                      border: 'none',
+                      padding: '8px 12px',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontWeight: isEnabled ? 'bold' : 'normal'
+                    }}
+                  >
+                    {game.label} {isEnabled ? '(ON)' : '(OFF)'}
+                  </button>
+                )
+              })}
             </div>
-          )}
+          </div>
+        </section>
+
+        <section className="card">
+          <h2>Live Leaderboard</h2>
+          <div style={{maxHeight: '250px', overflowY: 'auto'}}>
+            <table style={{width: '100%', textAlign: 'left'}}>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Player</th>
+                  <th>Score</th>
+                  <th>Streak</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.values(gameState.players || {})
+                  .sort((a, b) => (b.score || 0) - (a.score || 0))
+                  .map((p, i) => (
+                  <tr key={i}>
+                    <td>#{i + 1}</td>
+                    <td>{p.name}</td>
+                    <td>{p.score || 0}</td>
+                    <td>{p.streak || 0} 🔥</td>
+                  </tr>
+                ))}
+                {Object.keys(gameState.players || {}).length === 0 && <tr><td colSpan="4">No players yet.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="card">
+          <h2>Community Poem Live View</h2>
+          <div style={{ padding: '20px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', minHeight: '100px', fontSize: '1.2rem', fontStyle: 'italic', lineHeight: '1.6' }}>
+            {gameState.communityPoem ? Object.values(gameState.communityPoem).join(' ') : 'No words added yet...'}
+          </div>
         </section>
 
         <section className="card">

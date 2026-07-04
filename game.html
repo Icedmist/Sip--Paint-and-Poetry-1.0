@@ -143,6 +143,55 @@ body{
   padding:7px 18px;border-radius:20px;cursor:pointer;
 }
 
+/* ===== GAME SELECT SCREEN ===== */
+#s-game-select{
+  align-items:center;justify-content:flex-start;
+  padding:30px 20px;gap:16px;z-index:1;
+  background:radial-gradient(ellipse at top,rgba(46,187,90,0.06) 0%,transparent 60%);
+  overflow-y:auto;
+}
+.gs-card{
+  background:var(--bg3);border:2px solid rgba(255,255,255,0.08);
+  border-radius:12px;padding:20px;cursor:pointer;
+  transition:transform 0.2s;display:flex;align-items:center;gap:16px;
+  width:100%;max-width:400px;
+}
+.gs-card:active{transform:scale(0.97);}
+.gs-card-icon{font-size:32px;background:rgba(255,255,255,0.05);width:60px;height:60px;display:flex;align-items:center;justify-content:center;border-radius:12px;}
+.gs-card-content{flex:1;text-align:left;}
+.gs-card-title{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);letter-spacing:1px;margin-bottom:4px;}
+.gs-card-desc{font-size:12px;color:var(--muted);line-height:1.4;}
+
+/* ===== LEADERBOARD SCREEN ===== */
+#s-leaderboard{
+  align-items:center;justify-content:flex-start;
+  padding:30px 20px;gap:16px;z-index:1;
+  overflow-y:auto;
+}
+.lb-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg3);padding:16px;border-radius:12px;
+  width:100%;max-width:400px;margin-bottom:8px;
+}
+.lb-rank{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--orange);width:40px;}
+.lb-name{font-weight:600;flex:1;}
+.lb-score{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);}
+
+/* ===== POEM SCREEN ===== */
+#s-poem{
+  align-items:center;justify-content:center;
+  padding:30px 20px;gap:16px;z-index:1;
+}
+.poem-grid{
+  display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:400px;
+}
+.poem-word{
+  background:var(--bg3);border:1px solid rgba(255,255,255,0.1);
+  padding:12px 16px;border-radius:24px;font-size:16px;cursor:pointer;
+  transition:all 0.2s;
+}
+.poem-word:hover{background:var(--orange);color:white;border-color:var(--orange);}
+
 /* ===== QUESTION SCREEN ===== */
 #s-question{z-index:1;padding:0;overflow:hidden;}
 .q-header{
@@ -483,6 +532,41 @@ body{
   </div>
 </div>
 
+<!-- ===== GAME SELECT ===== -->
+<div class="screen" id="s-game-select">
+  <div class="join-title" style="font-size:36px;margin-bottom:0;">ARENA</div>
+  <div class="join-sub">Choose a game to play</div>
+  <button onclick="showScreen('s-leaderboard')" style="background:var(--bg3);border:1px solid var(--orange);color:var(--orange);padding:12px 24px;border-radius:24px;cursor:pointer;margin-bottom:20px;font-family:'Poppins',sans-serif;font-weight:600;">
+    <i class="ri-trophy-fill"></i> View Leaderboard
+  </button>
+  <div id="gs-list" style="width:100%;display:flex;flex-direction:column;gap:12px;align-items:center;">
+    <!-- Populated dynamically -->
+  </div>
+</div>
+
+<!-- ===== LEADERBOARD ===== -->
+<div class="screen" id="s-leaderboard">
+  <div class="join-title" style="font-size:36px;margin-bottom:0;color:var(--gold);">LEADERBOARD</div>
+  <button onclick="showScreen('s-game-select')" style="background:var(--bg3);border:1px solid var(--muted);color:var(--off);padding:8px 16px;border-radius:20px;cursor:pointer;margin-bottom:20px;">
+    ← Back to Arena
+  </button>
+  <div id="lb-list" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+    <!-- Populated dynamically -->
+  </div>
+</div>
+
+<!-- ===== POEM ===== -->
+<div class="screen" id="s-poem">
+  <div class="join-title" style="font-size:36px;margin-bottom:0;color:var(--pink);">COMMUNITY POEM</div>
+  <div class="join-sub">Select a word to add to the live poem</div>
+  <div class="poem-grid" id="poem-grid">
+    <!-- Populated dynamically -->
+  </div>
+  <button onclick="showScreen('s-game-select')" style="background:var(--bg3);border:1px solid var(--muted);color:var(--off);padding:8px 16px;border-radius:20px;cursor:pointer;margin-top:20px;">
+    ← Cancel
+  </button>
+</div>
+
 <!-- ===== QUESTION ===== -->
 <div class="screen" id="s-question">
   <div class="q-progress"><div class="q-progress-fill" id="q-prog-fill" style="width:0%"></div></div>
@@ -614,50 +698,67 @@ for(let i=0;i<50;i++) ppts.push({x:Math.random()*1000,y:Math.random()*1000,vx:(M
   requestAnimationFrame(drawParts);
 })();
 
-// ===== GAME STATE =====
+// ===== GAME STATE & CONSTANTS =====
 const STORAGE_KEY='pin_game_state';
 let playerName='',playerLives=3,playerScore=0,playerStreak=0,playerAnswered=false,playerAlive=true;
 let currentQ=null,timerInterval=null,timerSecs=0,adTimer=null;
-let gs={phase:'lobby',round:1,question:0,players:{},roundHistory:[],gameStarted:false,currentQData:null,answered:{},showingAnswer:false};
+let activeGameMode = '';
+let currentQIndex = 0;
 
-// ===== QUESTIONS BANK =====
-const QUESTIONS=[
-  // Round 1 — Warm-up Creative
-  {round:1,type:'Poetry Logic',icon:'<i class="ri-mic-fill"></i>',time:15,q:'A poet writes one poem every 2 days. How many poems will they write in June?',sub:'June has 30 days.',opts:['12 poems','15 poems','30 poems','6 poems'],ans:1,expl:'30 days ÷ 2 = 15 poems'},
-  {round:1,type:'Color Pattern',icon:'<i class="ri-palette-fill"></i>',time:15,q:'What color comes next in the pattern?',sub:'',pattern:['🔴','🟡','🟢','🔴','🟡','?'],opts:['🔴 Red','🟡 Yellow','🟢 Green','🔵 Blue'],ans:2,expl:'Pattern: Red→Yellow→Green repeats. Next is Green.'},
-  {round:1,type:'Word Scramble',icon:'<i class="ri-pen-nib-fill"></i>',time:20,q:'Unscramble this word related to today\'s event:',sub:'TIYPORE',opts:['POETRY','PAINTER','TROPHY','RIOTER'],ans:0,expl:'TIYPORE → POETRY'},
-  {round:1,type:'Nigerian Art',icon:'<i class="ri-flag-fill"></i>',time:15,q:'Which of these is a traditional Hausa art form?',sub:'Think about the culture of northern Nigeria.',opts:['Ukara weaving','Adire dyeing','Leather embossing','Nsibidi writing'],ans:2,expl:'Leather embossing (Tuareg/Hausa leather work) is iconic to northern Nigeria.'},
-  // Round 2 — Harder
-  {round:2,type:'Logic Puzzle',icon:'<i class="ri-puzzle-fill"></i>',time:12,q:'If RED=3, BLUE=4, GREEN=5, what does ORANGE equal?',sub:'Count the letters.',opts:['5','6','7','4'],ans:1,expl:'ORANGE has 6 letters → 6'},
-  {round:2,type:'Color Pattern',icon:'<i class="ri-palette-fill"></i>',time:12,q:'What is the missing number?',sub:'2 → 4 → 8 → ? → 32',pattern:['2','4','8','?','32'],opts:['12','14','16','10'],ans:2,expl:'Each number doubles: 8 × 2 = 16'},
-  {round:2,type:'Poetry Trivia',icon:'<i class="ri-mic-fill"></i>',time:15,q:'Which literary device repeats the same sound at the start of nearby words?',sub:'E.g. "Sip, Swirl, Speak"',opts:['Metaphor','Alliteration','Simile','Assonance'],ans:1,expl:'Alliteration is the repetition of initial consonant sounds.'},
-  {round:2,type:'Quick Math',icon:'<i class="ri-flashlight-fill"></i>',time:10,q:'An art gallery has 7 rows of paintings with 9 paintings each. 15 are sold. How many remain?',sub:'',opts:['48','63','58','46'],ans:0,expl:'7×9=63, 63-15=48'},
-  // Round 3 — Elimination
-  {round:3,type:'Advanced Logic',icon:'<i class="ri-trophy-fill"></i>',time:10,q:'A rhythm has: CLAP SNAP STOMP CLAP SNAP STOMP CLAP. What comes next?',sub:'Find the repeating beat pattern.',pattern:['👏','🫰','🦶','👏','🫰','🦶','👏','?'],opts:['👏 CLAP','🫰 SNAP','🦶 STOMP','<i class="ri-rhythm-fill"></i> BEAT'],ans:1,expl:'CLAP→SNAP→STOMP repeats. After CLAP comes SNAP.'},
-  {round:3,type:'Color Theory',icon:'<i class="ri-palette-fill"></i>',time:10,q:'Which two primary colors mix to make ORANGE?',sub:'Think about paint, not light.',opts:['Red + Blue','Yellow + Blue','Red + Yellow','Red + Green'],ans:2,expl:'Red + Yellow = Orange in traditional color mixing.'},
-  {round:3,type:'Final Logic',icon:'<i class="ri-flashlight-fill"></i>',time:8,q:'POET is to VERSE as PAINTER is to...?',sub:'Same relationship, different art form.',opts:['Gallery','Canvas','Brush','Easel'],ans:1,expl:'A poet creates verse; a painter creates on a canvas.'},
-  {round:3,type:'Lightning',icon:'<i class="ri-flashlight-fill"></i>',time:8,q:'If every 3rd attendee gets a prize, and there are 99 attendees, how many prizes?',sub:'',opts:['29','33','30','36'],ans:1,expl:'99 ÷ 3 = 33'},
-  // Bonus / Tiebreaker
-  {round:4,type:'Tiebreaker',icon:'<i class="ri-fire-fill"></i>',time:6,q:'How many letters are in "VOICES IN COLOR"?',sub:'Count carefully — spaces do not count.',opts:['12','13','14','15'],ans:2,expl:'V-O-I-C-E-S-I-N-C-O-L-O-R = 13 letters... wait: VOICES=6, IN=2, COLOR=5 → 13. The answer is 13 — but let\'s say 14 with spaces shown. Correct: 13.'},
-  {round:4,type:'Tiebreaker',icon:'<i class="ri-fire-fill"></i>',time:6,q:'Sip, Paint & Poetry starts at 9 AM and ends at 5 PM. How many hours is that?',sub:'',opts:['7 hours','8 hours','9 hours','6 hours'],ans:1,expl:'9 AM to 5 PM = 8 hours'},
-];
+const GAME_MODES = {
+  trivia: {
+    title: 'Paint by Trivia',
+    desc: 'Answer correctly to reveal the hidden masterpiece!',
+    icon: '<i class="ri-palette-fill"></i>',
+    questions: [
+      {type:'Trivia',icon:'<i class="ri-question-fill"></i>',time:15,q:'What color is formed by mixing blue and yellow?',opts:['Green','Purple','Orange','Brown'],ans:0,expl:'Blue + Yellow = Green'},
+      {type:'Trivia',icon:'<i class="ri-question-fill"></i>',time:15,q:'A poet writes one poem every 2 days. How many in June?',opts:['12','15','30','6'],ans:1,expl:'June has 30 days. 30/2 = 15.'},
+      {type:'Trivia',icon:'<i class="ri-question-fill"></i>',time:15,q:'Who painted the Mona Lisa?',opts:['Van Gogh','Da Vinci','Picasso','Michelangelo'],ans:1,expl:'Leonardo da Vinci painted the Mona Lisa.'}
+    ]
+  },
+  emoji: {
+    title: 'Emoji Charades',
+    desc: 'Can you guess the phrase from the emojis?',
+    icon: '<i class="ri-emotion-laugh-fill"></i>',
+    questions: [
+      {type:'Charades',icon:'<i class="ri-emotion-fill"></i>',time:12,q:'Guess the phrase:',pattern:['🎨','🍷','✍️'],opts:['Paint and Sip','Art Class','Sip, Paint & Poetry','Wine Tasting'],ans:2,expl:'Sip (wine), Paint (palette), Poetry (writing).'},
+      {type:'Charades',icon:'<i class="ri-emotion-fill"></i>',time:12,q:'Guess the movie:',pattern:['🦁','👑'],opts:['Lion King','King Kong','Jungle Book','Madagascar'],ans:0,expl:'Lion + Crown = Lion King'},
+      {type:'Charades',icon:'<i class="ri-emotion-fill"></i>',time:12,q:'Guess the concept:',pattern:['❤️','💔','🩹'],opts:['Hospital','Heartbreak & Healing','Romance','Cardiology'],ans:1,expl:'Heart -> Broken -> Healing'}
+    ]
+  },
+  rhyme: {
+    title: 'Rhyme Time',
+    desc: 'Quickly find the perfect rhyme!',
+    icon: '<i class="ri-mic-fill"></i>',
+    questions: [
+      {type:'Rhyme',icon:'<i class="ri-mic-line"></i>',time:10,q:'What rhymes with "ART"?',opts:['Paint','Heart','Canvas','Color'],ans:1,expl:'Art and Heart.'},
+      {type:'Rhyme',icon:'<i class="ri-mic-line"></i>',time:10,q:'What rhymes with "WINE"?',opts:['Dine','Sip','Glass','Grape'],ans:0,expl:'Wine and Dine.'},
+      {type:'Rhyme',icon:'<i class="ri-mic-line"></i>',time:10,q:'What rhymes with "SOUL"?',opts:['Spirit','Goal','Mind','Heart'],ans:1,expl:'Soul and Goal.'}
+    ]
+  },
+  fastest: {
+    title: 'Fastest Finger',
+    desc: 'Unscramble words under extreme time pressure!',
+    icon: '<i class="ri-flashlight-fill"></i>',
+    questions: [
+      {type:'Unscramble',icon:'<i class="ri-speed-fill"></i>',time:8,q:'Unscramble: TIYPORE',opts:['POETRY','PAINTER','TROPHY','RIOTER'],ans:0,expl:'TIYPORE -> POETRY'},
+      {type:'Unscramble',icon:'<i class="ri-speed-fill"></i>',time:8,q:'Unscramble: SNCAVA',opts:['VACANS','CANVAS','SAVANC','VANCAS'],ans:1,expl:'SNCAVA -> CANVAS'},
+      {type:'Unscramble',icon:'<i class="ri-speed-fill"></i>',time:8,q:'Unscramble: RCOLU',opts:['COLOR','LOUCR','ROCUL','CLURO'],ans:0,expl:'RCOLU -> COLOR'}
+    ]
+  }
+};
 
-let qIndex=0;
+const POEM_WORDS = ["love", "art", "soul", "wine", "brush", "color", "speak", "heart", "canvas", "rhythm", "life", "deep", "flow", "paint", "shadow", "light", "create", "voice", "truth"];
 
 // ===== BROADCAST (Firebase Realtime DB) =====
 let sharedState = {};
 
-db.ref('gameState').on('value', (snap) => {
+db.ref("gameState").on("value", (snap) => {
   sharedState = snap.val() || {};
   if (onValueCb) {
     try { onValueCb(sharedState); } catch(e) {}
   }
 });
-
-function broadcast(data){
-  Object.assign(sharedState, data);
-  db.ref('gameState').set(sharedState);
-}
 
 function getShared(){
   return sharedState;
@@ -674,99 +775,189 @@ function stopPolling(){
 
 // ===== SCREEN SYSTEM =====
 function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
-
 
 // ===== PLAYER JOIN =====
 function joinGame(){
-  const n=document.getElementById('player-name-inp').value.trim();
-  const c=document.getElementById('player-contact-inp').value.trim();
-  if(!n){showToast('<i class="ri-error-warning-fill"></i> Please enter your name');return;}
-  if(!c){showToast('<i class="ri-error-warning-fill"></i> Please enter your email or phone');return;}
+  const n=document.getElementById("player-name-inp").value.trim();
+  const c=document.getElementById("player-contact-inp").value.trim();
+  if(!n){showToast("<i class=\"ri-error-warning-fill\"></i> Please enter your name");return;}
+  if(!c){showToast("<i class=\"ri-error-warning-fill\"></i> Please enter your email or phone");return;}
   playerName=n;
-  playerLives=3;playerScore=0;playerStreak=0;playerAlive=true;
-  const initials=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  
+  // Try to load existing score if reconnecting
+  const existingPlayer = getShared()?.players?.[n];
+  if(existingPlayer) {
+    playerLives = existingPlayer.lives || 3;
+    playerScore = existingPlayer.score || 0;
+    playerStreak = existingPlayer.streak || 0;
+    playerAlive = existingPlayer.alive ?? true;
+  } else {
+    playerLives=3;playerScore=0;playerStreak=0;playerAlive=true;
+  }
+  
+  const initials=n.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);
 
   // Record registration
-  db.ref('gameRegistrations/' + n.replace(/[^a-zA-Z0-9]/g, '_')).set({
+  db.ref("gameRegistrations/" + n.replace(/[^a-zA-Z0-9]/g, "_")).set({
     name: n,
     contact: c,
     joined: Date.now()
   });
 
-  // Register in shared state safely without wiping everything
-  db.ref('gameState/players/' + n).set({name:n,lives:3,score:0,streak:0,alive:true,initials,joined:Date.now()});
+  // Register in shared state safely
+  updatePlayerInShared(initials);
 
-  document.getElementById('lobby-av').textContent=initials;
-  document.getElementById('lobby-name-display').textContent=n;
-  showScreen('s-player-lobby');
+  showScreen("s-game-select");
 
-  // Poll for game start
+  // Poll for game availability
   startPolling(state=>{
-    if(state.players){
-      const c=Object.values(state.players).length;
-      document.getElementById('lobby-count').textContent=c;
+    renderGameSelect(state.availableGames || {});
+    renderLeaderboard(state.players || {});
+    
+    // Check if player was eliminated remotely or ran out of lives
+    const me = state.players?.[playerName];
+    if(me && !me.alive && playerAlive) {
+      playerAlive = false;
+      showScreen("s-eliminated");
     }
-    if(state.phase==='question' && playerAlive){
-      stopPolling();
-      loadQuestion(state.currentQData,state);
-    }
-    if(state.phase==='ad'){stopPolling();showPlayerAd();}
-    if(state.phase==='winner'){stopPolling();showPlayerWinner(state);}
-    if(state.phase==='eliminated' && state.eliminated===playerName){stopPolling();showScreen('s-eliminated');}
   });
 }
 
-// ===== LOAD QUESTION (PLAYER) =====
-function loadQuestion(qData,state){
-  currentQ=qData;
-  playerAnswered=false;
-  const totalQ=QUESTIONS.length;
-  const progPct=((state.qIndex||0)/totalQ)*100;
-  document.getElementById('q-prog-fill').style.width=progPct+'%';
-  document.getElementById('q-round-label').textContent=`ROUND ${qData.round} · Q${(state.qIndex||0)+1}`;
-  document.getElementById('q-round-sub').textContent=qData.type;
-  document.getElementById('q-type-chip').innerHTML=qData.icon+' '+qData.type;
-  document.getElementById('q-text').textContent=qData.q;
-  document.getElementById('q-sub').textContent=qData.sub||'';
+function renderGameSelect(available) {
+  const list = document.getElementById("gs-list");
+  let html = "";
+  
+  Object.keys(GAME_MODES).forEach(id => {
+    if(available[id]) {
+      html += `
+      <div class="gs-card" onclick="startGameMode('${id}')">
+        <div class="gs-card-icon">${GAME_MODES[id].icon}</div>
+        <div class="gs-card-content">
+          <div class="gs-card-title">${GAME_MODES[id].title}</div>
+          <div class="gs-card-desc">${GAME_MODES[id].desc}</div>
+        </div>
+        <div style="color:var(--orange)"><i class="ri-arrow-right-line"></i></div>
+      </div>`;
+    }
+  });
+
+  if(available["poem"]) {
+    html += `
+    <div class="gs-card" onclick="startPoemMode()" style="border-color:var(--pink)">
+      <div class="gs-card-icon" style="color:var(--pink)"><i class="ri-quill-pen-fill"></i></div>
+      <div class="gs-card-content">
+        <div class="gs-card-title" style="color:var(--pink)">Community Poem</div>
+        <div class="gs-card-desc">Contribute a word to the live audience poem!</div>
+      </div>
+      <div style="color:var(--pink)"><i class="ri-arrow-right-line"></i></div>
+    </div>`;
+  }
+
+  if(!html) {
+    html = `<div style="text-align:center;color:var(--muted);margin-top:40px;">No games currently open.<br>Waiting for admin...</div>`;
+  }
+
+  list.innerHTML = html;
+}
+
+function renderLeaderboard(players) {
+  const list = document.getElementById("lb-list");
+  const sorted = Object.values(players).sort((a,b)=>(b.score||0)-(a.score||0));
+  
+  if(sorted.length === 0) {
+    list.innerHTML = `<div style="text-align:center;color:var(--muted);margin-top:40px;">No players yet.</div>`;
+    return;
+  }
+
+  list.innerHTML = sorted.map((p, i) => `
+    <div class="lb-row" style="${p.name === playerName ? 'border:1px solid var(--orange);' : ''}">
+      <div class="lb-rank">#${i+1}</div>
+      <div class="lb-name">${p.name} ${!p.alive ? '💀' : ''}</div>
+      <div class="lb-score">${p.score||0}</div>
+    </div>
+  `).join("");
+}
+
+function startPoemMode() {
+  document.getElementById("poem-grid").innerHTML = POEM_WORDS.map(word => 
+    `<div class="poem-word" onclick="selectPoemWord('${word}')">${word}</div>`
+  ).join("");
+  showScreen("s-poem");
+}
+
+function selectPoemWord(word) {
+  // Push word to firebase
+  db.ref("gameState/communityPoem").push(word).then(() => {
+    showToast("<i class=\"ri-check-fill\"></i> Word added to the poem!");
+    showScreen("s-game-select");
+  });
+}
+
+// ===== ASYNC GAME LOGIC =====
+function startGameMode(id) {
+  if(!playerAlive) {
+    showScreen("s-eliminated");
+    return;
+  }
+  activeGameMode = id;
+  currentQIndex = 0;
+  
+  // Custom initialization
+  if(id === 'trivia') {
+     document.getElementById('q-image-blur').style.display = 'block';
+     document.getElementById('q-image-blur').style.filter = 'blur(20px)';
+  } else {
+     document.getElementById('q-image-blur').style.display = 'none';
+  }
+  
+  loadAsyncQuestion();
+}
+
+function loadAsyncQuestion() {
+  const game = GAME_MODES[activeGameMode];
+  if(currentQIndex >= game.questions.length) {
+    showToast("<i class=\"ri-sparkling-fill\"></i> Game Completed!");
+    // Bonus points for completing a game mode!
+    playerScore += 200;
+    updatePlayerInShared();
+    showScreen("s-game-select");
+    return;
+  }
+
+  const qData = game.questions[currentQIndex];
+  currentQ = qData;
+  playerAnswered = false;
+  
+  const progPct = (currentQIndex / game.questions.length) * 100;
+  document.getElementById("q-prog-fill").style.width = progPct + "%";
+  document.getElementById("q-round-label").textContent = `${game.title} · Q${currentQIndex + 1}`;
+  document.getElementById("q-round-sub").textContent = qData.type;
+  document.getElementById("q-type-chip").innerHTML = qData.icon + " " + qData.type;
+  document.getElementById("q-text").textContent = qData.q;
+  document.getElementById("q-sub").textContent = qData.sub || "";
 
   // Pattern display
-  const pa=document.getElementById('q-pattern-area');
+  const pa = document.getElementById("q-pattern-area");
   if(qData.pattern && qData.pattern.length){
-    pa.innerHTML='<div class="q-pattern">'+qData.pattern.map((p,i)=>{
-      const isAns=p==='?';
+    pa.innerHTML = '<div class="q-pattern">' + qData.pattern.map((p,i)=>{
+      const isAns = p==="?";
       return `<div class="pattern-cell" style="background:${isAns?'rgba(255,107,53,0.15)':'rgba(255,255,255,0.04)'};border-color:${isAns?'rgba(255,107,53,0.5)':'rgba(255,255,255,0.1)'};font-size:${p.length===1&&p.codePointAt(0)>0xFF?'22px':'18px'}">${isAns?'?':p}</div>`;
-    }).join('')+'</div>';
-  } else {pa.innerHTML='';}
+    }).join("") + "</div>";
+  } else {pa.innerHTML = "";}
 
   // Options
-  const letters=['A','B','C','D'];
-  document.getElementById('q-options').innerHTML=qData.opts.map((o,i)=>`
+  const letters = ["A","B","C","D"];
+  document.getElementById("q-options").innerHTML = qData.opts.map((o,i)=>`
   <button class="opt-btn" id="opt-${i}" onclick="selectAnswer(${i})">
     <span class="opt-letter">${letters[i]}</span>${o}
-  </button>`).join('');
+  </button>`).join("");
 
-  // Lives display
-  const hearts=['<i class="ri-heart-3-fill"></i>','<i class="ri-heart-3-fill"></i>','<i class="ri-heart-3-fill"></i>'];
-  document.getElementById('q-lives').innerHTML=hearts.map((h,i)=>`<span class="q-life ${i>=playerLives?'gone':''}">${h}</span>`).join('');
-
-  showScreen('s-question');
-  startTimer(qData.time||15);
-
-  // Poll for answer reveal
-  startPolling(s2=>{
-    if(s2.phase==='showAnswer' && s2.currentQData===currentQ && s2.currentQData){
-      stopPolling();revealAnswer(s2.correctAnswer,s2.currentQData);
-    }
-    if(s2.phase==='question' && s2.qIndex!==(state.qIndex)){
-      stopPolling();loadQuestion(s2.currentQData,s2);
-    }
-    if(s2.phase==='ad'){stopPolling();showPlayerAd();}
-    if(s2.phase==='winner'){stopPolling();showPlayerWinner(s2);}
-    if(s2.phase==='eliminated' && s2.eliminated===playerName){stopPolling();stopTimer();showScreen('s-eliminated');}
-  });
+  updateLivesUI();
+  showScreen("s-question");
+  startTimer(qData.time || 15);
 }
 
 function startTimer(secs){
@@ -786,10 +977,13 @@ function startTimer(secs){
 function updateTimerUI(s,circum){
   const pct=s/(currentQ?.time||15);
   const offset=circum*(1-pct);
-  const bar=document.getElementById('timer-bar');
-  bar.style.strokeDashoffset=offset;
-  bar.style.stroke=s<=5?'#E8386D':s<=8?'#F5C842':'#FF6B35';
-  document.getElementById('timer-num').textContent=Math.max(0,s);
+  const bar=document.getElementById("timer-bar");
+  if(bar) {
+    bar.style.strokeDashoffset=offset;
+    bar.style.stroke=s<=5?"#E8386D":s<=8?"#F5C842":"#FF6B35";
+  }
+  const timerNum = document.getElementById("timer-num");
+  if(timerNum) timerNum.textContent=Math.max(0,s);
 }
 function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
 
@@ -797,35 +991,44 @@ function selectAnswer(idx){
   if(playerAnswered||!playerAlive)return;
   playerAnswered=true;
   stopTimer();
-  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
-  document.getElementById('opt-'+idx).style.borderColor='rgba(200,146,42,0.6)';
+  document.querySelectorAll(".opt-btn").forEach(b=>b.disabled=true);
+  document.getElementById("opt-"+idx).style.borderColor="rgba(200,146,42,0.6)";
 
-  // Record answer safely
-  db.ref('gameState/answered/' + playerName).set({idx,name:playerName,time:Date.now()});
-
-  showToast('<i class="ri-edit-2-fill"></i> Answer locked in!');
+  // Immediately check answer locally
+  setTimeout(() => revealAnswer(currentQ.ans, idx), 500);
 }
 
 function autoWrong(){
   if(playerAnswered)return;
   playerAnswered=true;
-  loseLife();
-  showToast('⏱ Time up!');
+  document.querySelectorAll(".opt-btn").forEach(b=>b.disabled=true);
+  revealAnswer(currentQ.ans, -1);
 }
 
-function revealAnswer(correctIdx,qData){
+function revealAnswer(correctIdx, selectedIdx){
   stopTimer();
-  const wasCorrect=playerAnswered && getShared().answered?.[playerName]?.idx===correctIdx;
-  document.querySelectorAll('.opt-btn').forEach((b,i)=>{
+  const wasCorrect = (selectedIdx === correctIdx);
+  
+  document.querySelectorAll(".opt-btn").forEach((b,i)=>{
     b.disabled=true;
-    if(i===correctIdx)b.classList.add('correct');
-    else if(getShared().answered?.[playerName]?.idx===i) b.classList.add('wrong');
+    if(i===correctIdx)b.classList.add("correct");
+    else if(i===selectedIdx) b.classList.add("wrong");
   });
+  
   setTimeout(()=>{
     if(wasCorrect){
       playerScore+=100+(timerSecs*5);
       playerStreak++;
       if(playerStreak>=3)playerScore+=50;
+      
+      // Update blur if trivia
+      if(activeGameMode === 'trivia') {
+        const game = GAME_MODES[activeGameMode];
+        const pctDone = (currentQIndex + 1) / game.questions.length;
+        const blurVal = Math.max(0, 20 * (1 - pctDone));
+        document.getElementById('q-image-blur').style.filter = `blur(${blurVal}px)`;
+      }
+      
       showResultScreen(true);
     } else {
       loseLife(true);
@@ -836,102 +1039,64 @@ function revealAnswer(correctIdx,qData){
 function loseLife(fromReveal=false){
   playerLives--;
   updateLivesUI();
+  updatePlayerInShared();
+  
+  // Check sip penalty (random 30% chance on lose life)
+  if(Math.random() < 0.3) {
+      showToast('🍷 SIP PENALTY! Take a sip!');
+  }
+  
   if(playerLives<=0){
     playerAlive=false;
-    setTimeout(()=>showScreen('s-eliminated'),fromReveal?600:200);
+    updatePlayerInShared();
+    setTimeout(()=>showScreen("s-eliminated"),fromReveal?600:200);
   } else {
     if(fromReveal)showResultScreen(false);
   }
 }
 
 function updateLivesUI(){
-  const el=document.getElementById('q-lives');
-  if(el) el.innerHTML=['<i class="ri-heart-3-fill"></i>','<i class="ri-heart-3-fill"></i>','<i class="ri-heart-3-fill"></i>'].map((_,i)=>`<span class="q-life ${i>=playerLives?'gone':''}"><i class="ri-heart-3-fill"></i></span>`).join('');
+  const el=document.getElementById("q-lives");
+  if(el) el.innerHTML=['<i class="ri-heart-3-fill"></i>','<i class="ri-heart-3-fill"></i>','<i class="ri-heart-3-fill"></i>'].map((_,i)=>`<span class="q-life ${i>=playerLives?'gone':''}"><i class="ri-heart-3-fill"></i></span>`).join("");
 }
 
 function showResultScreen(correct){
-  const icon=document.getElementById('res-icon');
-  const title=document.getElementById('res-title');
-  const sub=document.getElementById('res-sub');
+  const icon=document.getElementById("res-icon");
+  const title=document.getElementById("res-title");
+  const sub=document.getElementById("res-sub");
   if(correct){
-    icon.textContent='<i class="ri-checkbox-circle-fill"></i>';title.textContent='CORRECT!';
+    icon.innerHTML='<i class="ri-checkbox-circle-fill"></i>';title.textContent='CORRECT!';
     sub.textContent=currentQ.expl||'Brilliant answer!';
     title.style.color='var(--green)';
   } else {
     playerStreak=0;
-    icon.textContent='<i class="ri-close-fill"></i>';title.textContent='WRONG!';
-    sub.textContent=(currentQ.expl||'')+ ' · Lives left: '+playerLives+'<i class="ri-heart-3-fill"></i>';
+    icon.innerHTML='<i class="ri-close-fill"></i>';title.textContent='WRONG!';
+    sub.innerHTML=(currentQ.expl||'') + ' &middot; Lives left: '+playerLives+'<i class="ri-heart-3-fill"></i>';
     title.style.color='var(--pink)';
   }
-  document.getElementById('res-score').textContent=playerScore;
-  document.getElementById('res-streak').textContent='<i class="ri-fire-fill"></i> Streak: '+playerStreak+(playerStreak>=3?' (Bonus active!)':'');
-  showScreen('s-result');
+  document.getElementById("res-score").textContent=playerScore;
+  document.getElementById("res-streak").innerHTML='<i class="ri-fire-fill"></i> Streak: '+playerStreak+(playerStreak>=3?' (Bonus active!)':'');
+  showScreen("s-result");
   updatePlayerInShared();
-  // Poll for next
-  startPolling(s2=>{
-    if(s2.phase==='question' && s2.qIndex!==(getShared().qIndex-1)){
-      stopPolling();loadQuestion(s2.currentQData,s2);
-    }
-    if(s2.phase==='ad'){stopPolling();showPlayerAd();}
-    if(s2.phase==='winner'){stopPolling();showPlayerWinner(s2);}
-  });
 }
 
 function nextFromResult(){
-  // Player waits — admin controls next
+  currentQIndex++;
+  loadAsyncQuestion();
 }
 
-function updatePlayerInShared(){
+function updatePlayerInShared(initials = null){
   if(playerName) {
-    db.ref('gameState/players/' + playerName).update({
+    const updateData = {
       score: playerScore,
       lives: playerLives,
       streak: playerStreak,
       alive: playerAlive
-    });
+    };
+    if (initials) updateData.initials = initials;
+    db.ref("gameState/players/" + playerName).update(updateData);
   }
 }
-
-function showPlayerAd(){
-  showScreen('s-ad');
-  let t=8;
-  document.getElementById('ad-countdown').textContent='Next round in '+t+'s';
-  const skipBtn=document.getElementById('ad-skip-btn');
-  skipBtn.style.display='none';
-  adTimer=setInterval(()=>{
-    t--;
-    document.getElementById('ad-countdown').textContent='Next round in '+Math.max(0,t)+'s';
-    if(t<=3)skipBtn.style.display='block';
-    if(t<=0){clearInterval(adTimer);skipAd();}
-  },1000);
-  startPolling(s2=>{
-    if(s2.phase==='question' && playerAlive){stopPolling();clearInterval(adTimer);loadQuestion(s2.currentQData,s2);}
-    if(s2.phase==='winner'){stopPolling();clearInterval(adTimer);showPlayerWinner(s2);}
-  });
-}
-
-function skipAd(){
-  clearInterval(adTimer);
-  if(!playerAlive){showScreen('s-eliminated');return;}
-  // Wait for admin to push next question
-  showScreen('s-player-lobby');
-  document.getElementById('lobby-count').textContent=Object.keys(getShared().players||{}).length;
-  startPolling(s2=>{
-    if(s2.phase==='question' && playerAlive){stopPolling();loadQuestion(s2.currentQData,s2);}
-    if(s2.phase==='winner'){stopPolling();showPlayerWinner(s2);}
-  });
-}
-
-function showPlayerWinner(state){
-  const alive=Object.values(state.players||{}).filter(p=>p.alive);
-  const winner=alive.sort((a,b)=>b.score-a.score)[0]||{name:'Champion',score:0};
-  document.getElementById('winner-name-display').textContent=winner.name;
-  document.getElementById('winner-score-pill').textContent='Score: '+winner.score;
-  showScreen('s-winner');
-  launchConfetti();
-  if(winner.name===playerName) showToast('<i class="ri-sparkling-fill"></i> YOU ARE THE LAST VOICE STANDING!');
-}
-
 
 // ===== CONFETTI =====
 function launchConfetti(){
