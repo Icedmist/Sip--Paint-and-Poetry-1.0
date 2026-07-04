@@ -523,7 +523,8 @@ body{
   <div class="join-title">JOIN<br>THE GAME</div>
   <div class="join-sub">Sip, Paint & Poetry 1.0 — Last Voice Standing</div>
   <div class="join-form">
-    <input class="j-input" id="player-name-inp" placeholder="Enter your name" maxlength="20" />
+    <input class="j-input" id="player-name-inp" placeholder="Enter your name" maxlength="20" style="margin-bottom:10px;" />
+    <input class="j-input" id="player-contact-inp" placeholder="Email or Phone Number" maxlength="50" style="margin-bottom:15px;" />
     <button class="join-btn" onclick="joinGame()">🎮 Enter The Arena</button>
   </div>
   <div style="font-size:13px;color:var(--muted);text-align:center;line-height:1.8;">
@@ -823,10 +824,19 @@ function enterAdmin(){
 // ===== PLAYER JOIN =====
 function joinGame(){
   const n=document.getElementById('player-name-inp').value.trim();
+  const c=document.getElementById('player-contact-inp').value.trim();
   if(!n){showToast('⚠️ Please enter your name');return;}
+  if(!c){showToast('⚠️ Please enter your email or phone');return;}
   playerName=n;
   playerLives=3;playerScore=0;playerStreak=0;playerAlive=true;
   const initials=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+
+  // Record registration
+  db.ref('gameRegistrations/' + n.replace(/[^a-zA-Z0-9]/g, '_')).set({
+    name: n,
+    contact: c,
+    joined: Date.now()
+  });
 
   // Register in shared state
   const state=getShared();
