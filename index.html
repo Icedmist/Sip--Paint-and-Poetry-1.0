@@ -55,14 +55,15 @@ body:has(a:hover) #cursor,body:has(button:hover) #cursor{width:20px;height:20px;
 
 .word-anim {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(32px, 8vw, 64px);
-  letter-spacing: 4px;
+  gap: 12px;
+  font-family: 'Abril Fatface', serif;
+  font-size: clamp(48px, 10vw, 80px);
+  letter-spacing: 2px;
+  line-height: 1;
 }
 .aw-word {
   opacity: 0;
@@ -1061,7 +1062,45 @@ footer{
 <!-- ARENA BANNER -->
 <div id="arena-banner" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:140; background:linear-gradient(135deg,var(--orange-d),var(--orange)); padding:20px; text-align:center; box-shadow:0 -10px 30px rgba(255,107,53,0.3);">
   <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:8px;">THE ARENA IS NOW OPEN</div>
-  <a href="game.html" style="display:inline-block; background:var(--bg); color:var(--orange); padding:10px 24px; border-radius:6px; font-family:'Poppins',sans-serif; font-weight:700; text-decoration:none; text-transform:uppercase; letter-spacing:2px; font-size:13px; box-shadow:0 4px 15px rgba(0,0,0,0.4);">Join The Game</a>
+  <button onclick="openGameModal()" style="border:none; cursor:pointer; display:inline-block; background:var(--bg); color:var(--orange); padding:10px 24px; border-radius:6px; font-family:'Poppins',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:2px; font-size:13px; box-shadow:0 4px 15px rgba(0,0,0,0.4);">Join The Game</button>
+</div>
+
+<!-- GAME MODAL OVERLAY -->
+<div id="game-overlay" onclick="if(event.target===this)closeGameModal()" style="position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.88);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:20px;">
+  <div class="attend-modal" style="position:relative;">
+    <button class="modal-x" onclick="closeGameModal()">✕</button>
+
+    <!-- Game Register View -->
+    <div class="ob-step active" id="game-reg-step">
+      <div class="ob-top">
+        <div class="ob-emoji"><i class="ri-gamepad-fill"></i></div>
+        <div class="ob-title">Join Arena</div>
+        <div class="ob-sub">Register to play Sip, Paint &amp; Poetry minigames!</div>
+      </div>
+      <div class="ob-body">
+        <div class="f-grp"><label class="f-lbl">Name</label><input class="f-inp" id="g-reg-name" placeholder="Your name" /></div>
+        <div class="f-grp"><label class="f-lbl">Phone Number</label><input class="f-inp" id="g-reg-phone" placeholder="08012345678" /></div>
+        <div class="f-grp"><label class="f-lbl">Password</label><input type="password" class="f-inp" id="g-reg-pass" placeholder="Create a password" /></div>
+        <button class="ob-btn" id="g-btn-reg" onclick="registerGameUser()">Register & Play →</button>
+        <button class="ob-btn-ghost" onclick="toggleGameModalView('login')">Already registered? Login</button>
+      </div>
+    </div>
+
+    <!-- Game Login View -->
+    <div class="ob-step" id="game-login-step">
+      <div class="ob-top">
+        <div class="ob-emoji"><i class="ri-login-circle-fill"></i></div>
+        <div class="ob-title">Login</div>
+        <div class="ob-sub">Welcome back! Ready to play?</div>
+      </div>
+      <div class="ob-body">
+        <div class="f-grp"><label class="f-lbl">Phone Number or Name</label><input class="f-inp" id="g-login-uid" placeholder="Phone or Name" /></div>
+        <div class="f-grp"><label class="f-lbl">Password</label><input type="password" class="f-inp" id="g-login-pass" placeholder="Your password" /></div>
+        <button class="ob-btn" id="g-btn-login" onclick="loginGameUser()">Login & Play →</button>
+        <button class="ob-btn-ghost" onclick="toggleGameModalView('register')">Need an account? Register</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 </div><!-- /site -->
@@ -1300,14 +1339,17 @@ function buildProg(){
 buildProg();
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+import { getDatabase, ref, onValue, push, set, get, child } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBXYVqnK9R5Jz7oa2cHXmrbqNlC2XhXJho",
-  authDomain: "nexa-storeos.firebaseapp.com",
-  databaseURL: "https://nexa-storeos-default-rtdb.firebaseio.com",
-  projectId: "nexa-storeos",
-  storageBucket: "nexa-storeos.firebasestorage.app",
+  apiKey: "%VITE_FIREBASE_API_KEY%",
+  authDomain: "%VITE_FIREBASE_AUTH_DOMAIN%",
+  databaseURL: "%VITE_FIREBASE_DATABASE_URL%",
+  projectId: "%VITE_FIREBASE_PROJECT_ID%",
+  storageBucket: "%VITE_FIREBASE_STORAGE_BUCKET%",
+  messagingSenderId: "%VITE_FIREBASE_MESSAGING_SENDER_ID%",
+  appId: "%VITE_FIREBASE_APP_ID%",
+  measurementId: "%VITE_FIREBASE_MEASUREMENT_ID%"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -1422,6 +1464,135 @@ window.goStep = goStep;
 
 function showProgModal(){showStepId('s-prog');}
 window.showProgModal = showProgModal;
+
+// ===== GAME MODAL LOGIC =====
+function openGameModal() {
+  document.getElementById('game-overlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  toggleGameModalView('register');
+}
+window.openGameModal = openGameModal;
+
+function closeGameModal() {
+  document.getElementById('game-overlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+window.closeGameModal = closeGameModal;
+
+function toggleGameModalView(view) {
+  if(view === 'login') {
+    document.getElementById('game-reg-step').classList.remove('active');
+    document.getElementById('game-login-step').classList.add('active');
+  } else {
+    document.getElementById('game-login-step').classList.remove('active');
+    document.getElementById('game-reg-step').classList.add('active');
+  }
+}
+window.toggleGameModalView = toggleGameModalView;
+
+async function registerGameUser() {
+  const name = document.getElementById('g-reg-name').value.trim();
+  const phone = document.getElementById('g-reg-phone').value.trim();
+  const pass = document.getElementById('g-reg-pass').value.trim();
+  
+  if(!name || !phone || !pass) {
+    alert("Please fill in all fields (Name, Phone, Password).");
+    return;
+  }
+  
+  try {
+    const btn = document.getElementById('g-btn-reg');
+    const originalText = btn.textContent;
+    btn.textContent = 'Registering...';
+    btn.disabled = true;
+
+    // Check if user already exists
+    const usersRef = ref(db, 'gameRegistrations');
+    const snapshot = await get(usersRef);
+    if(snapshot.exists()) {
+      const users = snapshot.val();
+      const existing = Object.values(users).find(u => u.phone === phone || u.name.toLowerCase() === name.toLowerCase());
+      if(existing) {
+        alert("A user with this name or phone already exists. Please login instead.");
+        btn.textContent = originalText;
+        btn.disabled = false;
+        return;
+      }
+    }
+
+    const newUserRef = push(usersRef);
+    const userData = {
+      name,
+      phone,
+      password: pass, // In a real app this should be hashed, but for this event game it's fine.
+      registeredAt: Date.now()
+    };
+    await set(newUserRef, userData);
+    
+    // Save to localStorage for auto-login in game.html
+    localStorage.setItem('pinGameUser', JSON.stringify({ name, phone, id: newUserRef.key }));
+    
+    window.location.href = 'game.html';
+  } catch (error) {
+    console.error("Error registering user:", error);
+    alert("Failed to register. Please try again.");
+    document.getElementById('g-btn-reg').disabled = false;
+    document.getElementById('g-btn-reg').textContent = 'Register & Play →';
+  }
+}
+window.registerGameUser = registerGameUser;
+
+async function loginGameUser() {
+  const uid = document.getElementById('g-login-uid').value.trim();
+  const pass = document.getElementById('g-login-pass').value.trim();
+  
+  if(!uid || !pass) {
+    alert("Please enter your Name/Phone and Password.");
+    return;
+  }
+  
+  try {
+    const btn = document.getElementById('g-btn-login');
+    const originalText = btn.textContent;
+    btn.textContent = 'Logging in...';
+    btn.disabled = true;
+
+    const usersRef = ref(db, 'gameRegistrations');
+    const snapshot = await get(usersRef);
+    if(snapshot.exists()) {
+      const users = snapshot.val();
+      let foundUser = null;
+      let foundId = null;
+      
+      for(const [key, user] of Object.entries(users)) {
+        if((user.phone === uid || user.name.toLowerCase() === uid.toLowerCase()) && user.password === pass) {
+          foundUser = user;
+          foundId = key;
+          break;
+        }
+      }
+      
+      if(foundUser) {
+        localStorage.setItem('pinGameUser', JSON.stringify({ name: foundUser.name, phone: foundUser.phone, id: foundId }));
+        window.location.href = 'game.html';
+      } else {
+        alert("Invalid credentials. Please check your spelling or register a new account.");
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    } else {
+      alert("No registered users found. Please register first.");
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }
+  } catch(error) {
+    console.error("Error logging in:", error);
+    alert("Failed to login. Please try again.");
+    document.getElementById('g-btn-login').disabled = false;
+    document.getElementById('g-btn-login').textContent = 'Login & Play →';
+  }
+}
+window.loginGameUser = loginGameUser;
 </script>
 </body>
 </html>
