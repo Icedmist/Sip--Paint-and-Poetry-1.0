@@ -1114,7 +1114,7 @@ footer{
 <!-- FAB -->
 <button class="fab" onclick="openAttend()">
   <div class="fab-pulse"></div>
-  Check In / Register
+  Register
 </button>
 
 <!-- ATTEND MODAL -->
@@ -1514,7 +1514,7 @@ function goStepId(id){showStepId(id);}
 window.goStepId = goStepId;
 
 function goStep(n){
-  if(n===2){const nm=document.getElementById('n-name').value.trim();if(!nm){alert('Please enter your name');return;}}
+  if(n===2){const nm=document.getElementById('n-name').value.trim();}
   if(n===4){
     const nm=document.getElementById('n-name').value.trim()||'Guest';
     const phone=document.getElementById('n-phone').value.trim();
@@ -1595,20 +1595,7 @@ async function registerGameUser() {
     btn.textContent = 'Registering...';
     btn.disabled = true;
 
-    // Check if user already exists
     const usersRef = ref(db, 'gameRegistrations');
-    const snapshot = await get(usersRef);
-    if(snapshot.exists()) {
-      const users = snapshot.val();
-      const existing = Object.values(users).find(u => u.phone === phone || u.name.toLowerCase() === name.toLowerCase());
-      if(existing) {
-        alert("A user with this name or phone already exists. Please login instead.");
-        btn.textContent = originalText;
-        btn.disabled = false;
-        return;
-      }
-    }
-
     const newUserRef = push(usersRef);
     const userData = {
       name,

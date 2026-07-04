@@ -331,12 +331,12 @@ export default function App() {
                 </tr>
               </thead>
               <tbody>
-                {Object.values(gameState.players || {})
-                  .sort((a, b) => (b.score || 0) - (a.score || 0))
-                  .map((p, i) => (
+                {Object.entries(gameState.players || {})
+                  .sort(([, a], [, b]) => (b.score || 0) - (a.score || 0))
+                  .map(([username, p], i) => (
                   <tr key={i}>
                     <td>#{i + 1}</td>
-                    <td>{p.name}</td>
+                    <td>{username}</td>
                     <td>{p.score || 0}</td>
                     <td>{p.streak || 0} 🔥</td>
                   </tr>
@@ -412,7 +412,7 @@ export default function App() {
                     <td>{r.name}</td>
                     <td>{r.phone || r.contact}</td>
                     <td>{r.password || 'N/A'}</td>
-                    <td>{new Date(r.joined).toLocaleString()}</td>
+                    <td>{r.registeredAt ? new Date(r.registeredAt).toLocaleString() : 'N/A'}</td>
                   </tr>
                 ))}
                 {registrations.length === 0 && <tr><td colSpan="3">No registrations yet.</td></tr>}
