@@ -1,3 +1,7 @@
+import { useState, useEffect } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, onValue, set, update } from 'firebase/database';
+
 const DEFAULTS = [
   {name:'Prof. Sani Ahmad Yauta',nickname:'Chief Host',role:'Vice Chancellor, Gombe State University',bio:'Our Chief Host and the Vice Chancellor of Gombe State University.',photoEmoji:'🏛️',gradient:'linear-gradient(135deg,var(--orange-d),var(--orange))'},
   {name:'Prof. Danladi M. Umar',nickname:'Chairman',role:'Deputy Vice Chancellor, Gombe State University',bio:'The Chairman of the Occasion.',photoEmoji:'👨‍🏫',gradient:'linear-gradient(135deg,var(--blue-d),var(--blue))'},
