@@ -906,11 +906,12 @@ function startGameMode(id) {
   currentQIndex = 0;
   
   // Custom initialization
-  if(id === 'trivia') {
-     document.getElementById('q-image-blur').style.display = 'block';
-     document.getElementById('q-image-blur').style.filter = 'blur(20px)';
-  } else {
-     document.getElementById('q-image-blur').style.display = 'none';
+  const blurEl = document.getElementById('q-image-blur');
+  if(id === 'trivia' && blurEl) {
+     blurEl.style.display = 'block';
+     blurEl.style.filter = 'blur(20px)';
+  } else if(blurEl) {
+     blurEl.style.display = 'none';
   }
   
   loadAsyncQuestion();
@@ -1026,7 +1027,8 @@ function revealAnswer(correctIdx, selectedIdx){
         const game = GAME_MODES[activeGameMode];
         const pctDone = (currentQIndex + 1) / game.questions.length;
         const blurVal = Math.max(0, 20 * (1 - pctDone));
-        document.getElementById('q-image-blur').style.filter = `blur(${blurVal}px)`;
+        const blurImg = document.getElementById('q-image-blur');
+        if(blurImg) blurImg.style.filter = `blur(${blurVal}px)`;
       }
       
       showResultScreen(true);
