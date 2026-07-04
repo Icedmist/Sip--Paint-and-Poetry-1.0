@@ -16,11 +16,11 @@
   --off:#F5F0E8;--muted:rgba(245,240,232,0.45);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
+html{scroll-behavior:smooth; overflow-x: hidden; width: 100%; max-width: 100%;}
 body{
   font-family:'Poppins',sans-serif;
   background:var(--bg);color:var(--off);
-  overflow-x:hidden;cursor:none;
+  overflow-x:hidden;cursor:none; width: 100%; max-width: 100%; position: relative;
 }
 
 /* ===== CUSTOM CURSOR ===== */
@@ -55,10 +55,11 @@ body:has(a:hover) #cursor,body:has(button:hover) #cursor{width:20px;height:20px;
 
 .word-anim {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 15px;
+  gap: 20px;
   font-family: 'Bebas Neue', sans-serif;
   font-size: clamp(32px, 8vw, 64px);
   letter-spacing: 4px;
@@ -202,7 +203,7 @@ nav.scrolled{
   position:relative;
 }
 .hw-sip{
-  font-size:clamp(80px,20vw,180px);
+  font-size:clamp(60px,20vw,180px);
   color:var(--off);
   animation:reveal-up 0.7s ease 0.1s both;
   text-shadow:
@@ -211,14 +212,14 @@ nav.scrolled{
     12px 12px 20px rgba(0,0,0,0.5);
 }
 .hw-paint{
-  font-size:clamp(90px,22vw,200px);
+  font-size:clamp(70px,22vw,200px);
   background:linear-gradient(135deg,var(--orange),var(--gold-l),var(--orange-d));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   animation:reveal-up 0.7s ease 0.2s both;
   filter:drop-shadow(0 8px 30px rgba(255,107,53,0.35));
 }
 .hw-poetry{
-  font-size:clamp(70px,18vw,160px);
+  font-size:clamp(50px,18vw,160px);
   color:var(--green-l);
   animation:reveal-up 0.7s ease 0.3s both;
   text-shadow:
@@ -228,7 +229,7 @@ nav.scrolled{
 }
 .hw-version{
   display:inline-block;
-  font-size:clamp(28px,5vw,52px);
+  font-size:clamp(20px,5vw,52px);
   background:var(--orange);color:white;
   padding:6px 18px;margin-left:12px;
   vertical-align:middle;
@@ -838,8 +839,45 @@ footer{
   .is-item{border-right:none;border-bottom:1px solid rgba(255,255,255,0.05);}
   .pres-grid{grid-template-columns:1fr 1fr;}
   .hero-3d-wrap{perspective:none;}
+  /* Hide custom cursor on mobile */
+  #cursor, #cursor-ring { display: none !important; }
+  body { cursor: auto; }
+  .btn-main, .btn-ghost, .pill, .ob-btn, .ob-btn-ghost, .pv-back, .modal-x, .fab, a, button { cursor: pointer; }
+  /* Adjust hero shapes */
+  .geo-1, .geo-2, .geo-3, .geo-4 { display: none; }
 }
-@media(max-width:480px){.pres-grid{grid-template-columns:1fr;}}
+@media(max-width:480px){
+  .pres-grid{grid-template-columns:1fr;}
+  .nav-logo { flex-direction: row; gap: 8px; }
+  .nav-name span { display: none; }
+  .nav-name { font-size: 13px; }
+  .nav-cta { padding: 8px 12px; font-size: 10px; }
+  .nav-pin-badge { width: 32px; height: 32px; font-size: 11px; }
+  .nav-pin-badge small { font-size: 6px; }
+  #hero { padding: 90px 15px 50px; perspective: none; }
+  .hero-theme { font-size: 9px; padding: 6px 14px; letter-spacing: 1px; }
+  .hw-sip { font-size: clamp(32px, 12vw, 180px); }
+  .hw-paint { font-size: clamp(40px, 14vw, 200px); }
+  .hw-poetry { font-size: clamp(28px, 10vw, 160px); }
+  .hw-version { font-size: clamp(14px, 5vw, 52px); padding: 4px 10px; margin-left: 6px; }
+  .cd-num { font-size: 28px; }
+  .cd-unit { min-width: 60px; padding: 10px 8px 8px; }
+  .hero-btns { flex-direction: column; width: 100%; gap: 10px; }
+  .btn-main, .btn-ghost { width: 100%; }
+  .section { padding: 60px 16px; }
+  .sec-heading { font-size: clamp(32px, 8vw, 80px); }
+  .about-grid { gap: 40px; margin-top: 40px; }
+  .prog-item { grid-template-columns: 65px 1fr; }
+  .prog-dot { left: 59px; }
+  .prog-item::before { left: 65px; }
+  .prog-time-col { padding-top: 24px; font-size: 16px; padding-right: 12px; }
+  .prog-content-col { padding-left: 16px; }
+  .footer-logo { font-size: 28px; }
+  .footer-contacts { flex-direction: column; gap: 12px; }
+  .ob-top { padding: 24px 20px 20px; }
+  .ob-title { font-size: 24px; }
+  .ob-body { padding: 20px; }
+}
 </style>
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
 </head>
@@ -892,7 +930,7 @@ footer{
 
   <div class="hero-eyebrow">
     <div class="eyebrow-line"></div>
-    <div class="eyebrow-text">Gombe, Nigeria · June 4, 2026</div>
+    <div class="eyebrow-text">Gombe, Nigeria · July 4, 2026</div>
     <div class="eyebrow-line"></div>
   </div>
 
@@ -929,7 +967,7 @@ footer{
 
 <!-- INFO STRIP -->
 <div class="info-strip">
-  <div class="is-item sr"><div class="is-icon"><i class="ri-calendar-event-fill"></i></div><div><div class="is-label">Date</div><div class="is-val">4th June 2026</div></div></div>
+  <div class="is-item sr"><div class="is-icon"><i class="ri-calendar-event-fill"></i></div><div><div class="is-label">Date</div><div class="is-val">4th July 2026</div></div></div>
   <div class="is-item sr" style="transition-delay:0.1s"><div class="is-icon"><i class="ri-time-fill"></i></div><div><div class="is-label">Time</div><div class="is-val">9:00 AM Prompt</div></div></div>
   <div class="is-item sr" style="transition-delay:0.2s"><div class="is-icon"><i class="ri-map-pin-fill"></i></div><div><div class="is-label">Venue</div><div class="is-val">Haruna Kadir Rashid New MPH, GSU</div></div></div>
   <div class="is-item sr" style="transition-delay:0.3s"><div class="is-icon"><i class="ri-ticket-2-fill"></i></div><div><div class="is-label">Entry</div><div class="is-val">Free — Registration Required</div></div></div>
@@ -1062,9 +1100,9 @@ footer{
           <div class="pill" onclick="this.classList.toggle('on')"><i class="ri-palette-fill"></i> Painting</div>
           <div class="pill" onclick="this.classList.toggle('on')"><i class="ri-music-2-fill"></i> Music</div>
           <div class="pill" onclick="this.classList.toggle('on')"><i class="ri-goblet-fill"></i> Sipping</div>
-          <div class="pill" onclick="this.classList.toggle('on')">📸 Photos</div>
+          <div class="pill" onclick="this.classList.toggle('on')"><i class="ri-camera-fill"></i> Photos</div>
           <div class="pill" onclick="this.classList.toggle('on')"><i class="ri-pen-nib-fill"></i> Writing</div>
-          <div class="pill" onclick="this.classList.toggle('on')">🤝 Networking</div>
+          <div class="pill" onclick="this.classList.toggle('on')"><i class="ri-group-fill"></i> Networking</div>
           <div class="pill" onclick="this.classList.toggle('on')"><i class="ri-trophy-fill"></i> Cert</div>
         </div>
         <button class="ob-btn" onclick="goStep(4)" style="margin-top:20px;">Continue →</button>
@@ -1072,7 +1110,7 @@ footer{
     </div>
 
     <div class="ob-step" id="s4">
-      <div class="ob-top"><div class="ob-emoji"><i class="ri-gift-fill"></i></div><div class="ob-title">You're In!</div><div class="ob-sub">See you on June 4th at 9:00 AM!</div></div>
+      <div class="ob-top"><div class="ob-emoji"><i class="ri-gift-fill"></i></div><div class="ob-title">You're In!</div><div class="ob-sub">See you on July 4th at 9:00 AM!</div></div>
       <div class="ob-body">
         <div class="ob-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot on"></div></div>
         <div style="text-align:center;">
@@ -1082,7 +1120,7 @@ footer{
           <div style="font-size:14px;color:var(--muted);margin-bottom:14px;">You are officially registered. We can't wait to see you!</div>
           <div class="wticket">
             <div class="wt-row"><span class="wt-k">Event</span><span class="wt-v">Sip, Paint &amp; Poetry 1.0</span></div>
-            <div class="wt-row"><span class="wt-k">Date</span><span class="wt-v">13th June 2026 · 9:00 AM</span></div>
+            <div class="wt-row"><span class="wt-k">Date</span><span class="wt-v">4th July 2026 · 9:00 AM</span></div>
             <div class="wt-row"><span class="wt-k">Venue</span><span class="wt-v">HKR New MPH, GSU</span></div>
             <div class="wt-row"><span class="wt-k">Name</span><span class="wt-v" id="w-tname">—</span></div>
             <div class="wt-id" id="w-id">PIN-0001</div>
@@ -1097,7 +1135,7 @@ footer{
       <div id="step-prog">
         <div class="pv-hd">
           <button class="pv-back" onclick="goStepId('s4')">←</button>
-          <div class="pv-ttl">Programme · June 13</div>
+          <div class="pv-ttl">Programme · July 4</div>
         </div>
         <div class="pv-live">
           <div class="pv-live-lbl"><div class="ticker-dot" style="width:8px;height:8px;"></div>Now On Stage</div>
@@ -1170,9 +1208,7 @@ window.addEventListener('scroll',()=>{
 });
 
 // ===== COUNTDOWN =====
-const tmr = new Date();
-tmr.setDate(tmr.getDate() + 1);
-tmr.setHours(9, 0, 0, 0);
+const tmr = new Date('2026-07-04T09:00:00');
 function updateCD(){
   const t=tmr-new Date();
   if(t<=0){['cd-d','cd-h','cd-m','cd-s'].forEach(id=>document.getElementById(id).textContent='00');return;}
