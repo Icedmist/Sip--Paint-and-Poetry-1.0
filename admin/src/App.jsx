@@ -1,22 +1,31 @@
-import { useState, useEffect } from 'react';
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, set, update } from "firebase/database";
+const DEFAULTS = [
+  {name:'Prof. Sani Ahmad Yauta',nickname:'Chief Host',role:'Vice Chancellor, Gombe State University',bio:'Our Chief Host and the Vice Chancellor of Gombe State University.',photoEmoji:'🏛️',gradient:'linear-gradient(135deg,var(--orange-d),var(--orange))'},
+  {name:'Prof. Danladi M. Umar',nickname:'Chairman',role:'Deputy Vice Chancellor, Gombe State University',bio:'The Chairman of the Occasion.',photoEmoji:'👨‍🏫',gradient:'linear-gradient(135deg,var(--blue-d),var(--blue))'},
+  {name:'Assoc. Prof. Buhari Magaji',nickname:'Host',role:'Event Host',bio:'Our dedicated Host for the evening.',photoEmoji:'🎤',gradient:'linear-gradient(135deg,var(--pink-d),var(--pink))'},
+  {name:'Alh. Yaya Hammari',nickname:'Royal Father',role:'Royal Father of the Day',bio:'Our esteemed Royal Father of the Day.',photoEmoji:'👑',gradient:'linear-gradient(135deg,var(--gold-d),var(--gold))'},
+  {name:'Assoc. Prof. Aishatu Kumo',nickname:'Mother of the Day',role:'Mother of the Day',bio:'Our distinguished Mother of the Day.',photoEmoji:'🌺',gradient:'linear-gradient(135deg,var(--pink-d),var(--pink))'},
+  {name:'Alh. Dr. Jamilu Ishayaku Gwamna',nickname:'Special Guest',role:'Special Guest of Honor',bio:'Our Special Guest of Honor for Sip, Paint & Poetry 1.0.',photoEmoji:'🌟',gradient:'linear-gradient(135deg,var(--orange-d),var(--orange))'},
+  
+  // Guests of Honor
+  {name:'Prof. Aliyu Usman Bafeto',nickname:'Guest of Honor',role:'Registrar, Gombe State University',bio:'Guest of Honor.',photoEmoji:'🎓',gradient:'linear-gradient(135deg,var(--green-d),var(--green))'},
+  {name:'Prof. Dr. Yusuf Muhammad',nickname:'Guest of Honor',role:'Chief Medical Director, FTH Gombe',bio:'Guest of Honor.',photoEmoji:'🏥',gradient:'linear-gradient(135deg,var(--green-d),var(--green))'},
+  {name:'Mr. Amin Amos',nickname:'Guest of Honor',role:'Ma\'ori',bio:'Guest of Honor.',photoEmoji:'✨',gradient:'linear-gradient(135deg,var(--green-d),var(--green))'},
+  {name:'Khalifa Sadiqu Shehu',nickname:'Guest of Honor',role:'Guest of Honor',bio:'Guest of Honor.',photoEmoji:'✨',gradient:'linear-gradient(135deg,var(--green-d),var(--green))'},
+  {name:'Engr. Muhammad Y. Gorki',nickname:'Guest of Honor',role:'Guest of Honor',bio:'Guest of Honor.',photoEmoji:'✨',gradient:'linear-gradient(135deg,var(--green-d),var(--green))'},
 
-const QUESTIONS = [
-  {round:1,type:'Poetry Logic',icon:'<i class="ri-mic-fill"></i>',time:15,q:'A poet writes one poem every 2 days. How many poems will they write in June?',sub:'June has 30 days.',opts:['12 poems','15 poems','30 poems','6 poems'],ans:1,expl:'30 days ÷ 2 = 15 poems'},
-  {round:1,type:'Color Pattern',icon:'<i class="ri-palette-fill"></i>',time:15,q:'What color comes next in the pattern?',sub:'',pattern:['🔴','🟡','🟢','🔴','🟡','?'],opts:['🔴 Red','🟡 Yellow','🟢 Green','🔵 Blue'],ans:2,expl:'Pattern: Red→Yellow→Green repeats. Next is Green.'},
-  {round:1,type:'Word Scramble',icon:'<i class="ri-pen-nib-fill"></i>',time:20,q:'Unscramble this word related to today\'s event:',sub:'TIYPORE',opts:['POETRY','PAINTER','TROPHY','RIOTER'],ans:0,expl:'TIYPORE → POETRY'},
-  {round:1,type:'Nigerian Art',icon:'<i class="ri-flag-fill"></i>',time:15,q:'Which of these is a traditional Hausa art form?',sub:'Think about the culture of northern Nigeria.',opts:['Ukara weaving','Adire dyeing','Leather embossing','Nsibidi writing'],ans:2,expl:'Leather embossing (Tuareg/Hausa leather work) is iconic to northern Nigeria.'},
-  {round:2,type:'Logic Puzzle',icon:'<i class="ri-puzzle-fill"></i>',time:12,q:'If RED=3, BLUE=4, GREEN=5, what does ORANGE equal?',sub:'Count the letters.',opts:['5','6','7','4'],ans:1,expl:'ORANGE has 6 letters → 6'},
-  {round:2,type:'Color Pattern',icon:'<i class="ri-palette-fill"></i>',time:12,q:'What is the missing number?',sub:'2 → 4 → 8 → ? → 32',pattern:['2','4','8','?','32'],opts:['12','14','16','10'],ans:2,expl:'Each number doubles: 8 × 2 = 16'},
-  {round:2,type:'Poetry Trivia',icon:'<i class="ri-mic-fill"></i>',time:15,q:'Which literary device repeats the same sound at the start of nearby words?',sub:'E.g. "Sip, Swirl, Speak"',opts:['Metaphor','Alliteration','Simile','Assonance'],ans:1,expl:'Alliteration is the repetition of initial consonant sounds.'},
-  {round:2,type:'Quick Math',icon:'<i class="ri-flashlight-fill"></i>',time:10,q:'An art gallery has 7 rows of paintings with 9 paintings each. 15 are sold. How many remain?',sub:'',opts:['48','63','58','46'],ans:0,expl:'7×9=63, 63-15=48'},
-  {round:3,type:'Advanced Logic',icon:'<i class="ri-trophy-fill"></i>',time:10,q:'A rhythm has: CLAP SNAP STOMP CLAP SNAP STOMP CLAP. What comes next?',sub:'Find the repeating beat pattern.',pattern:['👏','🫰','🦶','👏','🫰','🦶','👏','?'],opts:['👏 CLAP','🫰 SNAP','🦶 STOMP','<i class="ri-rhythm-fill"></i> BEAT'],ans:1,expl:'CLAP→SNAP→STOMP repeats. After CLAP comes SNAP.'},
-  {round:3,type:'Color Theory',icon:'<i class="ri-palette-fill"></i>',time:10,q:'Which two primary colors mix to make ORANGE?',sub:'Think about paint, not light.',opts:['Red + Blue','Yellow + Blue','Red + Yellow','Red + Green'],ans:2,expl:'Red + Yellow = Orange in traditional color mixing.'},
-  {round:3,type:'Final Logic',icon:'<i class="ri-flashlight-fill"></i>',time:8,q:'POET is to VERSE as PAINTER is to...?',sub:'Same relationship, different art form.',opts:['Gallery','Canvas','Brush','Easel'],ans:1,expl:'A poet creates verse; a painter creates on a canvas.'},
-  {round:3,type:'Lightning',icon:'<i class="ri-flashlight-fill"></i>',time:8,q:'If every 3rd attendee gets a prize, and there are 99 attendees, how many prizes?',sub:'',opts:['29','33','30','36'],ans:1,expl:'99 ÷ 3 = 33'},
-  {round:4,type:'Tiebreaker',icon:'<i class="ri-fire-fill"></i>',time:6,q:'How many letters are in "VOICES IN COLOR"?',sub:'Count carefully — spaces do not count.',opts:['12','13','14','15'],ans:2,expl:'V-O-I-C-E-S-I-N-C-O-L-O-R = 13 letters... wait: VOICES=6, IN=2, COLOR=5 → 13. The answer is 13 — but let\'s say 14 with spaces shown. Correct: 13.'},
-  {round:4,type:'Tiebreaker',icon:'<i class="ri-fire-fill"></i>',time:6,q:'Sip, Paint & Poetry starts at 9 AM and ends at 5 PM. How many hours is that?',sub:'',opts:['7 hours','8 hours','9 hours','6 hours'],ans:1,expl:'9 AM to 5 PM = 8 hours'},
+  // Keynote & Special Guests
+  {name:'Hon. Simon Elisha Karu',nickname:'Keynote',role:'Keynote Speaker',bio:'Delivering the keynote address on Voices in Color.',photoEmoji:'🎙️',gradient:'linear-gradient(135deg,var(--orange-d),var(--orange))'},
+  {name:'Rt. Hon. Sadam Bello',nickname:'Special Guest',role:'Special Guest',bio:'Special Guest.',photoEmoji:'⭐',gradient:'linear-gradient(135deg,var(--blue-d),var(--blue))'},
+  {name:'Barr. Ibrahim Kalayi',nickname:'Special Guest',role:'Special Guest',bio:'Special Guest.',photoEmoji:'⭐',gradient:'linear-gradient(135deg,var(--blue-d),var(--blue))'},
+  {name:'Hon. Ibrahim Ishaya',nickname:'Ibro Fish Abuja',role:'Special Guest',bio:'Special Guest.',photoEmoji:'⭐',gradient:'linear-gradient(135deg,var(--blue-d),var(--blue))'},
+
+  // Institutional
+  {name:'Dean',nickname:'Institutional Guest',role:'Faculty of Arts, Gombe State University',bio:'Institutional Guest.',photoEmoji:'🏛️',gradient:'linear-gradient(135deg,var(--gold-d),var(--gold))'},
+  {name:'Deputy Dean',nickname:'Institutional Guest',role:'Faculty of Arts, Gombe State University',bio:'Institutional Guest.',photoEmoji:'🏛️',gradient:'linear-gradient(135deg,var(--gold-d),var(--gold))'},
+
+  // Award Recipients
+  {name:'Engr. Aliyu Muhammad Kombat',nickname:'Award Recipient',role:'Chairman, Velocity Humanitarian Foundation',bio:'Recipient of the "True Son of the Soil Award".',photoEmoji:'🏆',gradient:'linear-gradient(135deg,var(--gold-d),var(--gold))'},
+  {name:'Dr. Abdulrahman Shuaibu',nickname:'Award Recipient',role:'Exec. Secretary, Primary Health Care Development Agency',bio:'Award Recipient.',photoEmoji:'🏆',gradient:'linear-gradient(135deg,var(--gold-d),var(--gold))'}
 ];
 
 const firebaseConfig = {
