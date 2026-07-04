@@ -56,14 +56,14 @@ body:has(a:hover) #cursor,body:has(button:hover) #cursor{width:20px;height:20px;
 .word-anim {
   display: flex;
   flex-direction: column;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  font-family: 'Abril Fatface', serif;
-  font-size: clamp(48px, 10vw, 80px);
-  letter-spacing: 2px;
-  line-height: 1;
+  gap: 8px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(80px, 18vw, 150px);
+  letter-spacing: 6px;
+  line-height: 0.9;
 }
 .aw-word {
   opacity: 0;
@@ -1451,6 +1451,29 @@ function goStep(n){
   if(n===2){const nm=document.getElementById('n-name').value.trim();if(!nm){alert('Please enter your name');return;}}
   if(n===4){
     const nm=document.getElementById('n-name').value.trim()||'Guest';
+    const phone=document.getElementById('n-phone').value.trim();
+    const occ=document.getElementById('n-occ').value.trim();
+    const city=document.getElementById('n-city').value.trim();
+    
+    // Get selected vibes
+    const vibeElements=document.querySelectorAll('.ob-pills .pill.on');
+    const vibes = Array.from(vibeElements).map(el => el.textContent.trim());
+
+    // Store in Firebase
+    try {
+      const regRef = push(ref(db, 'eventRegistrations'));
+      set(regRef, {
+        name: nm,
+        phone: phone,
+        occupation: occ,
+        city: city,
+        vibes: vibes,
+        registeredAt: Date.now()
+      });
+    } catch (e) {
+      console.error("Failed to save event registration to Firebase", e);
+    }
+
     const ini=nm.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     document.getElementById('w-av').textContent=ini;
     document.getElementById('w-name').textContent='Welcome, '+nm.split(' ')[0]+'!';

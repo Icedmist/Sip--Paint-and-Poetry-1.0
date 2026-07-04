@@ -977,6 +977,23 @@ function showToast(msg){
 
 // Keyboard enter support
 document.getElementById('player-name-inp').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame();});
+
+// Auto-join from registration/login in index.html
+window.onload = function() {
+  const pinUser = localStorage.getItem('pinGameUser');
+  if (pinUser) {
+    try {
+      const u = JSON.parse(pinUser);
+      if (u.name && u.phone) {
+        document.getElementById('player-name-inp').value = u.name;
+        document.getElementById('player-contact-inp').value = u.phone;
+        joinGame();
+      }
+    } catch(e) {
+      console.error("Error parsing pinGameUser", e);
+    }
+  }
+};
 </script>
 </body>
 </html>
