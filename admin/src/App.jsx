@@ -211,6 +211,13 @@ export default function App() {
     });
   };
 
+  const toggleArena = () => {
+    update(ref(db, 'gameState'), {
+      arenaOpen: !gameState.arenaOpen,
+      timestamp: Date.now()
+    }).then(() => alert(`Arena is now ${!gameState.arenaOpen ? 'OPEN' : 'CLOSED'}`));
+  };
+
   const updatePartners = () => {
     set(ref(db, 'partnersData'), {
       names: partners,
@@ -239,6 +246,31 @@ export default function App() {
     const updated = [...presenters];
     updated[index] = { ...updated[index], [field]: value };
     setPresenters(updated);
+  };
+
+  const handleImageUpload = (index, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 400;
+        const scaleSize = Math.min(1, MAX_WIDTH / img.width);
+        canvas.width = img.width * scaleSize;
+        canvas.height = img.height * scaleSize;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        const base64Str = canvas.toDataURL('image/jpeg', 0.6);
+        handleEditPresenter(index, 'photo', base64Str);
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSavePresenters = () => {
@@ -301,6 +333,9 @@ export default function App() {
           <h2>Game Master Control</h2>
           <p>Current Phase: <strong style={{textTransform:'capitalize'}}>{gamePhase}</strong></p>
           <div className="btn-group" style={{ flexWrap: 'wrap' }}>
+            <button onClick={toggleArena} style={{ background: gameState.arenaOpen ? '#E8386D' : '#2EBB5A', color: 'white', border: 'none', borderRadius: '4px', padding: '8px 16px', cursor: 'pointer', fontWeight: 'bold' }}>
+              {gameState.arenaOpen ? 'Close Arena' : 'Open Arena'}
+            </button>
             <button onClick={startGame} className="btn-primary" disabled={gameState.gameStarted}>Start Game</button>
             <button onClick={nextQuestion} className="btn-primary" disabled={!gameState.gameStarted || gamePhase === 'lobby'}>Reveal & Next Question</button>
             <button onClick={showAd} className="btn-primary" disabled={!gameState.gameStarted}>Show Ad</button>
@@ -343,6 +378,11 @@ export default function App() {
                   <input type="checkbox" checked={p.live} onChange={(e) => handleEditPresenter(i, 'live', e.target.checked)} />
                   Live On Stage
                 </label>
+                <div style={{display:'flex', gap:'10px', alignItems:'center', width:'100%', marginTop:'5px'}}>
+                  <span style={{fontSize:'12px'}}>Photo:</span>
+                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(i, e)} style={{fontSize:'12px'}} />
+                  {p.photo && <img src={p.photo} style={{width:'40px',height:'40px',objectFit:'cover',borderRadius:'50%'}} />}
+                </div>
                 <button onClick={() => handleDeletePresenter(i)} style={{color:'red', cursor: 'pointer'}}>Delete</button>
               </div>
             ))}
@@ -357,7 +397,8 @@ export default function App() {
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Contact (Email/Phone)</th>
+                  <th>Phone Number</th>
+                  <th>Password</th>
                   <th>Joined At</th>
                 </tr>
               </thead>
@@ -365,7 +406,8 @@ export default function App() {
                 {registrations.map((r, i) => (
                   <tr key={i}>
                     <td>{r.name}</td>
-                    <td>{r.contact}</td>
+                    <td>{r.phone || r.contact}</td>
+                    <td>{r.password || 'N/A'}</td>
                     <td>{new Date(r.joined).toLocaleString()}</td>
                   </tr>
                 ))}

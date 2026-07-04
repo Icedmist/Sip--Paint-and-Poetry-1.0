@@ -1058,6 +1058,12 @@ footer{
   <div class="footer-copy">© 2026 Poets In Nigeria × Teemerh Arts Foundation. Platform by <span class="footer-nexa">Nexa Digital Solutions Ltd</span>.</div>
 </footer>
 
+<!-- ARENA BANNER -->
+<div id="arena-banner" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:140; background:linear-gradient(135deg,var(--orange-d),var(--orange)); padding:20px; text-align:center; box-shadow:0 -10px 30px rgba(255,107,53,0.3);">
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:8px;">THE ARENA IS NOW OPEN</div>
+  <a href="game.html" style="display:inline-block; background:var(--bg); color:var(--orange); padding:10px 24px; border-radius:6px; font-family:'Poppins',sans-serif; font-weight:700; text-decoration:none; text-transform:uppercase; letter-spacing:2px; font-size:13px; box-shadow:0 4px 15px rgba(0,0,0,0.4);">Join The Game</a>
+</div>
+
 </div><!-- /site -->
 
 <!-- FAB -->
@@ -1340,6 +1346,15 @@ onValue(ref(db, 'presentersData'), (snapshot) => {
     // Assuming data is an array or object
     presenters = Array.isArray(data) ? data : Object.values(data);
     buildPresCards();
+  }
+});
+
+// Sync Arena Status Banner
+onValue(ref(db, 'gameState/arenaOpen'), (snapshot) => {
+  const isOpen = snapshot.val();
+  const banner = document.getElementById('arena-banner');
+  if (banner) {
+    banner.style.display = isOpen ? 'block' : 'none';
   }
 });
 
