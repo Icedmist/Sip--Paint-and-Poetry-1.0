@@ -1,10 +1,17 @@
 :root {
-  --gold: #C8922A; 
-  --bg: #0D0D0D; 
-  --bg2: #161616;
-  --border: rgba(255, 255, 255, 0.08); 
-  --text: #F0EDE6; 
-  --muted: rgba(240, 237, 230, 0.4); 
+  --gold: #C8922A;
+  --gold-l: #F5C842;
+  --gold-d: #8B6010;
+  --orange: #FF6B35;
+  --orange-d: #E8520A;
+  --black: #080808;
+  --bg: #0C0A08;
+  --bg2: #131109;
+  --bg3: #1A1705;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #F5F0E8;
+  --muted: rgba(245, 240, 232, 0.45);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -17,6 +24,7 @@ body {
   font-family: 'Poppins', sans-serif;
   background-color: var(--bg);
   color: var(--text);
+  overflow-x: hidden;
 }
 
 .login-container {
@@ -24,23 +32,175 @@ body {
   align-items: center;
   justify-content: center;
   height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg);
+}
+
+/* Background Glow Effect */
+.login-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(200, 146, 42, 0.18) 0%, rgba(255, 107, 53, 0.06) 50%, transparent 100%);
+  filter: blur(80px);
+  z-index: 0;
+  pointer-events: none;
+  animation: pulseGlow 12s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% {
+    transform: scale(1) translate(-10%, -10%);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.2) translate(10%, 10%);
+    opacity: 1;
+  }
 }
 
 .login-box {
-  background-color: var(--bg2);
-  padding: 40px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  background: rgba(19, 17, 9, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 48px 40px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
   text-align: center;
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
+  z-index: 1;
+  position: relative;
+  animation: boxFadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes boxFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 8px auto;
+  background: linear-gradient(135deg, rgba(200, 146, 42, 0.15), rgba(200, 146, 42, 0.02));
+  border: 1.5px solid rgba(200, 146, 42, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: var(--gold-l);
+  box-shadow: 0 0 20px rgba(200, 146, 42, 0.15);
+  animation: floatIcon 4s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+    box-shadow: 0 0 25px rgba(200, 146, 42, 0.25);
+  }
 }
 
 .login-box h2 {
-  color: var(--gold);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.4rem;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--text), var(--gold-l));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: -4px;
+}
+
+.login-subtitle {
+  font-size: 0.9rem;
+  color: var(--muted);
+  letter-spacing: 1px;
+  font-weight: 300;
+  margin-top: -12px;
+  margin-bottom: 8px;
+}
+
+/* Custom Input Group styling */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px;
+  font-size: 1.2rem;
+  color: var(--muted);
+  pointer-events: none;
+  transition: var(--transition);
+  z-index: 2;
+}
+
+.input-group input {
+  width: 100%;
+  background-color: rgba(8, 8, 8, 0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  padding: 14px 16px 14px 48px;
+  border-radius: 10px;
+  outline: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.input-group input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 15px rgba(200, 146, 42, 0.15);
+  background-color: var(--black);
+}
+
+.input-group:focus-within .input-icon {
+  color: var(--gold-l);
+}
+
+/* Submit Button styling */
+.login-box button[type="submit"] {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-d) 100%);
+  color: var(--black);
+  border: none;
+  padding: 14px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(200, 146, 42, 0.25);
+  transition: var(--transition);
+  margin-top: 8px;
+}
+
+.login-box button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(200, 146, 42, 0.45);
+  background: linear-gradient(135deg, var(--gold-l) 0%, var(--gold) 100%);
+}
+
+.login-box button[type="submit"]:active {
+  transform: translateY(0);
 }
 
 .admin-container {

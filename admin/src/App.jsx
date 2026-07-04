@@ -216,14 +216,22 @@ export default function App() {
   if (!isAuthenticated) {
     return (
       <div className="login-container">
+        <div className="login-glow"></div>
         <form className="login-box" onSubmit={handleLogin}>
+          <div className="login-icon">
+            <i className="ri-shield-key-line"></i>
+          </div>
           <h2>Admin Access</h2>
-          <input 
-            type="password" 
-            placeholder="Enter Password" 
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
+          <p className="login-subtitle">Sip, Paint & Poetry Control Panel</p>
+          <div className="input-group">
+            <i className="ri-lock-password-line input-icon"></i>
+            <input 
+              type="password" 
+              placeholder="Enter Password" 
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+          </div>
           <button type="submit">Access Dashboard</button>
         </form>
       </div>
