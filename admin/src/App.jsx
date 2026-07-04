@@ -129,7 +129,7 @@ export default function App() {
   const handleAddPresenter = () => {
     const newP = {
       name: 'New Presenter', nickname: 'Nickname', role: 'Role', bio: 'Bio here...',
-      photo: null, photoEmoji: '🎤', slot: '10:00 AM', live: false,
+      photo: null, photoEmoji: '<i className="ri-mic-fill"></i>', slot: '10:00 AM', live: false,
       gradient: 'linear-gradient(160deg,#d4cfc9,#b8b3ad)'
     };
     updatePresenters([...presenters, newP]);

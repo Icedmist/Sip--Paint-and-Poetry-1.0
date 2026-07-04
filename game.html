@@ -490,6 +490,7 @@ body{
 }
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 </style>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
 </head>
 <body>
 
@@ -505,12 +506,12 @@ body{
   <div class="role-sub">Pick your role to begin</div>
   <div class="role-cards">
     <div class="role-card admin-card" onclick="enterAdmin()">
-      <div class="role-icon">👑</div>
+      <div class="role-icon"><i class="ri-vip-crown-fill"></i></div>
       <div class="role-label" style="color:var(--gold);">Admin</div>
       <div class="role-desc">Control the game, manage rounds, see all players</div>
     </div>
     <div class="role-card player-card" onclick="showScreen('s-join')">
-      <div class="role-icon">🎤</div>
+      <div class="role-icon"><i class="ri-mic-fill"></i></div>
       <div class="role-label" style="color:var(--orange);">Player</div>
       <div class="role-desc">Join the game on your phone and play to win</div>
     </div>
@@ -528,9 +529,9 @@ body{
     <button class="join-btn" onclick="joinGame()">🎮 Enter The Arena</button>
   </div>
   <div style="font-size:13px;color:var(--muted);text-align:center;line-height:1.8;">
-    ⚡ Fastest fingers survive<br>
-    ❤️ 3 lives — one wrong = minus one<br>
-    🏆 Last player standing wins
+    <i class="ri-flashlight-fill"></i> Fastest fingers survive<br>
+    <i class="ri-heart-3-fill"></i> 3 lives — one wrong = minus one<br>
+    <i class="ri-trophy-fill"></i> Last player standing wins
   </div>
   <div class="join-nexa-note">Game experience by <span>Nexa Digital Solutions</span></div>
   <button onclick="showScreen('s-role')" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:-8px;">← Back</button>
@@ -543,7 +544,7 @@ body{
       <div class="lobby-avatar" id="lobby-av">AB</div>
     </div>
     <div class="lobby-name" id="lobby-name-display">Player</div>
-    <div class="lobby-badge">✓ You're In The Arena</div>
+    <div class="lobby-badge"><i class="ri-check-line"></i> You're In The Arena</div>
   </div>
   <div class="lobby-players-count" id="lobby-count">0</div>
   <div class="lobby-players-label">players in the arena</div>
@@ -558,7 +559,7 @@ body{
     <div class="lna-name">NEXA DIGITAL</div>
     <div class="lna-sub">Websites · Apps · Branding · Digital Solutions</div>
     <div class="lna-sub" style="margin-top:3px;color:rgba(245,240,232,0.3);font-size:10px;">Based in Jalingo · Serving all Nigeria</div>
-    <div class="lna-cta" onclick="showToast('💚 Contact Nexa: nexa@digital.ng')">Get A Free Quote →</div>
+    <div class="lna-cta" onclick="showToast('<i class=&quot;ri-heart-3-fill&quot;></i> Contact Nexa: nexa@digital.ng')">Get A Free Quote →</div>
   </div>
 </div>
 
@@ -581,7 +582,7 @@ body{
     </div>
   </div>
   <div class="q-body" id="q-body">
-    <div class="q-type-chip" id="q-type-chip">🎨 Creative Logic</div>
+    <div class="q-type-chip" id="q-type-chip"><i class="ri-palette-fill"></i> Creative Logic</div>
     <div class="q-text" id="q-text">Loading question...</div>
     <div class="q-sub" id="q-sub"></div>
     <div id="q-pattern-area"></div>
@@ -592,21 +593,21 @@ body{
 
 <!-- ===== ROUND RESULT ===== -->
 <div class="screen" id="s-result">
-  <div class="res-icon" id="res-icon">✅</div>
+  <div class="res-icon" id="res-icon"><i class="ri-checkbox-circle-fill"></i></div>
   <div class="res-title" id="res-title">CORRECT!</div>
   <div class="res-sub" id="res-sub">Brilliant! That's correct.</div>
   <div class="res-score-box">
     <div class="res-score-num" id="res-score">0</div>
     <div class="res-score-label">Total Score</div>
   </div>
-  <div class="res-streak" id="res-streak">🔥 Streak: 0</div>
+  <div class="res-streak" id="res-streak"><i class="ri-fire-fill"></i> Streak: 0</div>
   <button class="res-btn" id="res-next-btn" onclick="nextFromResult()">Next →</button>
   <div class="nexa-footer">Powered by <span>Nexa Digital Solutions Ltd</span></div>
 </div>
 
 <!-- ===== ELIMINATED ===== -->
 <div class="screen" id="s-eliminated">
-  <div style="font-size:80px;animation:bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1)">💔</div>
+  <div style="font-size:80px;animation:bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1)"><i class="ri-heart-3-line"></i></div>
   <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:3px;color:var(--pink);text-align:center;">ELIMINATED</div>
   <div style="font-size:14px;color:var(--muted);text-align:center;line-height:1.8;max-width:280px;">
     You've used all your lives.<br>Better luck next event!<br>
@@ -616,7 +617,7 @@ body{
     <div style="font-size:10px;letter-spacing:2px;color:var(--nexa);text-transform:uppercase;margin-bottom:8px;">Don't miss out on digital</div>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--nexa);letter-spacing:3px;">NEXA DIGITAL</div>
     <div style="font-size:12px;color:var(--muted);margin-top:4px;">We build websites, apps & brands<br>that make you unforgettable.</div>
-    <div onclick="showToast('💚 Reach Nexa: +234 800 NEXA')" style="margin-top:12px;background:var(--nexa);color:var(--bg);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 20px;border-radius:20px;cursor:pointer;display:inline-block;">Contact Us Free</div>
+    <div onclick="showToast('<i class=&quot;ri-heart-3-fill&quot;></i> Reach Nexa: +234 800 NEXA')" style="margin-top:12px;background:var(--nexa);color:var(--bg);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 20px;border-radius:20px;cursor:pointer;display:inline-block;">Contact Us Free</div>
   </div>
   <div class="nexa-footer">Powered by <span>Nexa Digital Solutions Ltd</span></div>
 </div>
@@ -628,13 +629,13 @@ body{
   <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--off);">DIGITAL SOLUTIONS LTD</div>
   <div class="ad-tagline">"We build the digital future — one pixel at a time"</div>
   <div class="ad-cards">
-    <div class="ad-card"><div class="ad-card-icon">🌐</div><div class="ad-card-title">Websites</div><div class="ad-card-sub">Modern & fast</div></div>
-    <div class="ad-card"><div class="ad-card-icon">📱</div><div class="ad-card-title">Mobile Apps</div><div class="ad-card-sub">iOS & Android</div></div>
-    <div class="ad-card"><div class="ad-card-icon">🎨</div><div class="ad-card-title">Branding</div><div class="ad-card-sub">Logos & identity</div></div>
-    <div class="ad-card"><div class="ad-card-icon">📊</div><div class="ad-card-title">Digital Mktg</div><div class="ad-card-sub">Grow your reach</div></div>
+    <div class="ad-card"><div class="ad-card-icon"><i class="ri-global-fill"></i></div><div class="ad-card-title">Websites</div><div class="ad-card-sub">Modern & fast</div></div>
+    <div class="ad-card"><div class="ad-card-icon"><i class="ri-smartphone-fill"></i></div><div class="ad-card-title">Mobile Apps</div><div class="ad-card-sub">iOS & Android</div></div>
+    <div class="ad-card"><div class="ad-card-icon"><i class="ri-palette-fill"></i></div><div class="ad-card-title">Branding</div><div class="ad-card-sub">Logos & identity</div></div>
+    <div class="ad-card"><div class="ad-card-icon"><i class="ri-bar-chart-fill"></i></div><div class="ad-card-title">Digital Mktg</div><div class="ad-card-sub">Grow your reach</div></div>
   </div>
   <div style="font-size:13px;color:var(--muted);text-align:center;">Based in Jalingo, Taraba · Serving all of Nigeria</div>
-  <button class="ad-cta" onclick="showToast('💚 nexa@digital.ng · +234 800 NEXA')">🚀 Get Started Free</button>
+  <button class="ad-cta" onclick="showToast('<i class=&quot;ri-heart-3-fill&quot;></i> nexa@digital.ng · +234 800 NEXA')"><i class="ri-rocket-fill"></i> Get Started Free</button>
   <div class="ad-countdown" id="ad-countdown">Next round in 8s</div>
   <div class="ad-skip" id="ad-skip-btn" onclick="skipAd()" style="display:none;">Skip Ad ›</div>
 </div>
@@ -643,15 +644,15 @@ body{
 <div class="screen" id="s-winner">
   <canvas id="confetti-canvas"></canvas>
   <div class="winner-bg"></div>
-  <div class="winner-crown">👑</div>
-  <div class="winner-label">🏆 Last Voice Standing 🏆</div>
+  <div class="winner-crown"><i class="ri-vip-crown-fill"></i></div>
+  <div class="winner-label"><i class="ri-trophy-fill"></i> Last Voice Standing <i class="ri-trophy-fill"></i></div>
   <div class="winner-title">WINNER!</div>
   <div class="winner-name" id="winner-name-display">Champion</div>
   <div class="winner-score-pill" id="winner-score-pill">Score: 0</div>
   <div style="font-size:13px;color:var(--muted);text-align:center;line-height:1.8;max-width:280px;z-index:2;">
-    The last voice standing at<br>Sip, Paint & Poetry 1.0 🎤🎨🎵
+    The last voice standing at<br>Sip, Paint & Poetry 1.0 <i class="ri-mic-fill"></i><i class="ri-palette-fill"></i><i class="ri-music-2-fill"></i>
   </div>
-  <button class="winner-cert-btn" onclick="showToast('🏆 Certificate being generated!')">🏆 Download Certificate</button>
+  <button class="winner-cert-btn" onclick="showToast('<i class=&quot;ri-trophy-fill&quot;></i> Certificate being generated!')"><i class="ri-trophy-fill"></i> Download Certificate</button>
   <div class="winner-nexa">Game powered by Nexa Digital Solutions Ltd</div>
 </div>
 
@@ -692,7 +693,7 @@ body{
         <button class="a-btn a-btn-start" id="btn-start" onclick="adminStartGame()">▶ Start Game</button>
         <button class="a-btn a-btn-next" id="btn-next" onclick="adminNextQuestion()" disabled>⏭ Next Question</button>
         <button class="a-btn a-btn-ad" id="btn-ad" onclick="adminShowAd()" disabled>📺 Show Nexa Ad Break</button>
-        <button class="a-btn a-btn-winner" id="btn-declare" onclick="adminDeclareWinner()" disabled>🏆 Declare Winner</button>
+        <button class="a-btn a-btn-winner" id="btn-declare" onclick="adminDeclareWinner()" disabled><i class="ri-trophy-fill"></i> Declare Winner</button>
         <button class="a-btn a-btn-end" onclick="adminResetGame()">↺ Reset Game</button>
       </div>
     </div>
@@ -755,23 +756,23 @@ let gs={phase:'lobby',round:1,question:0,players:{},roundHistory:[],gameStarted:
 // ===== QUESTIONS BANK =====
 const QUESTIONS=[
   // Round 1 — Warm-up Creative
-  {round:1,type:'Poetry Logic',icon:'🎤',time:15,q:'A poet writes one poem every 2 days. How many poems will they write in June?',sub:'June has 30 days.',opts:['12 poems','15 poems','30 poems','6 poems'],ans:1,expl:'30 days ÷ 2 = 15 poems'},
-  {round:1,type:'Color Pattern',icon:'🎨',time:15,q:'What color comes next in the pattern?',sub:'',pattern:['🔴','🟡','🟢','🔴','🟡','?'],opts:['🔴 Red','🟡 Yellow','🟢 Green','🔵 Blue'],ans:2,expl:'Pattern: Red→Yellow→Green repeats. Next is Green.'},
-  {round:1,type:'Word Scramble',icon:'✍️',time:20,q:'Unscramble this word related to today\'s event:',sub:'TIYPORE',opts:['POETRY','PAINTER','TROPHY','RIOTER'],ans:0,expl:'TIYPORE → POETRY'},
-  {round:1,type:'Nigerian Art',icon:'🇳🇬',time:15,q:'Which of these is a traditional Hausa art form?',sub:'Think about the culture of northern Nigeria.',opts:['Ukara weaving','Adire dyeing','Leather embossing','Nsibidi writing'],ans:2,expl:'Leather embossing (Tuareg/Hausa leather work) is iconic to northern Nigeria.'},
+  {round:1,type:'Poetry Logic',icon:'<i class="ri-mic-fill"></i>',time:15,q:'A poet writes one poem every 2 days. How many poems will they write in June?',sub:'June has 30 days.',opts:['12 poems','15 poems','30 poems','6 poems'],ans:1,expl:'30 days ÷ 2 = 15 poems'},
+  {round:1,type:'Color Pattern',icon:'<i class="ri-palette-fill"></i>',time:15,q:'What color comes next in the pattern?',sub:'',pattern:['🔴','🟡','🟢','🔴','🟡','?'],opts:['🔴 Red','🟡 Yellow','🟢 Green','🔵 Blue'],ans:2,expl:'Pattern: Red→Yellow→Green repeats. Next is Green.'},
+  {round:1,type:'Word Scramble',icon:'<i class="ri-pen-nib-fill"></i>',time:20,q:'Unscramble this word related to today\'s event:',sub:'TIYPORE',opts:['POETRY','PAINTER','TROPHY','RIOTER'],ans:0,expl:'TIYPORE → POETRY'},
+  {round:1,type:'Nigerian Art',icon:'<i class="ri-flag-fill"></i>',time:15,q:'Which of these is a traditional Hausa art form?',sub:'Think about the culture of northern Nigeria.',opts:['Ukara weaving','Adire dyeing','Leather embossing','Nsibidi writing'],ans:2,expl:'Leather embossing (Tuareg/Hausa leather work) is iconic to northern Nigeria.'},
   // Round 2 — Harder
-  {round:2,type:'Logic Puzzle',icon:'🧩',time:12,q:'If RED=3, BLUE=4, GREEN=5, what does ORANGE equal?',sub:'Count the letters.',opts:['5','6','7','4'],ans:1,expl:'ORANGE has 6 letters → 6'},
-  {round:2,type:'Color Pattern',icon:'🎨',time:12,q:'What is the missing number?',sub:'2 → 4 → 8 → ? → 32',pattern:['2','4','8','?','32'],opts:['12','14','16','10'],ans:2,expl:'Each number doubles: 8 × 2 = 16'},
-  {round:2,type:'Poetry Trivia',icon:'🎤',time:15,q:'Which literary device repeats the same sound at the start of nearby words?',sub:'E.g. "Sip, Swirl, Speak"',opts:['Metaphor','Alliteration','Simile','Assonance'],ans:1,expl:'Alliteration is the repetition of initial consonant sounds.'},
-  {round:2,type:'Quick Math',icon:'⚡',time:10,q:'An art gallery has 7 rows of paintings with 9 paintings each. 15 are sold. How many remain?',sub:'',opts:['48','63','58','46'],ans:0,expl:'7×9=63, 63-15=48'},
+  {round:2,type:'Logic Puzzle',icon:'<i class="ri-puzzle-fill"></i>',time:12,q:'If RED=3, BLUE=4, GREEN=5, what does ORANGE equal?',sub:'Count the letters.',opts:['5','6','7','4'],ans:1,expl:'ORANGE has 6 letters → 6'},
+  {round:2,type:'Color Pattern',icon:'<i class="ri-palette-fill"></i>',time:12,q:'What is the missing number?',sub:'2 → 4 → 8 → ? → 32',pattern:['2','4','8','?','32'],opts:['12','14','16','10'],ans:2,expl:'Each number doubles: 8 × 2 = 16'},
+  {round:2,type:'Poetry Trivia',icon:'<i class="ri-mic-fill"></i>',time:15,q:'Which literary device repeats the same sound at the start of nearby words?',sub:'E.g. "Sip, Swirl, Speak"',opts:['Metaphor','Alliteration','Simile','Assonance'],ans:1,expl:'Alliteration is the repetition of initial consonant sounds.'},
+  {round:2,type:'Quick Math',icon:'<i class="ri-flashlight-fill"></i>',time:10,q:'An art gallery has 7 rows of paintings with 9 paintings each. 15 are sold. How many remain?',sub:'',opts:['48','63','58','46'],ans:0,expl:'7×9=63, 63-15=48'},
   // Round 3 — Elimination
-  {round:3,type:'Advanced Logic',icon:'🏆',time:10,q:'A rhythm has: CLAP SNAP STOMP CLAP SNAP STOMP CLAP. What comes next?',sub:'Find the repeating beat pattern.',pattern:['👏','🫰','🦶','👏','🫰','🦶','👏','?'],opts:['👏 CLAP','🫰 SNAP','🦶 STOMP','🥁 BEAT'],ans:1,expl:'CLAP→SNAP→STOMP repeats. After CLAP comes SNAP.'},
-  {round:3,type:'Color Theory',icon:'🎨',time:10,q:'Which two primary colors mix to make ORANGE?',sub:'Think about paint, not light.',opts:['Red + Blue','Yellow + Blue','Red + Yellow','Red + Green'],ans:2,expl:'Red + Yellow = Orange in traditional color mixing.'},
-  {round:3,type:'Final Logic',icon:'⚡',time:8,q:'POET is to VERSE as PAINTER is to...?',sub:'Same relationship, different art form.',opts:['Gallery','Canvas','Brush','Easel'],ans:1,expl:'A poet creates verse; a painter creates on a canvas.'},
-  {round:3,type:'Lightning',icon:'⚡',time:8,q:'If every 3rd attendee gets a prize, and there are 99 attendees, how many prizes?',sub:'',opts:['29','33','30','36'],ans:1,expl:'99 ÷ 3 = 33'},
+  {round:3,type:'Advanced Logic',icon:'<i class="ri-trophy-fill"></i>',time:10,q:'A rhythm has: CLAP SNAP STOMP CLAP SNAP STOMP CLAP. What comes next?',sub:'Find the repeating beat pattern.',pattern:['👏','🫰','🦶','👏','🫰','🦶','👏','?'],opts:['👏 CLAP','🫰 SNAP','🦶 STOMP','<i class="ri-rhythm-fill"></i> BEAT'],ans:1,expl:'CLAP→SNAP→STOMP repeats. After CLAP comes SNAP.'},
+  {round:3,type:'Color Theory',icon:'<i class="ri-palette-fill"></i>',time:10,q:'Which two primary colors mix to make ORANGE?',sub:'Think about paint, not light.',opts:['Red + Blue','Yellow + Blue','Red + Yellow','Red + Green'],ans:2,expl:'Red + Yellow = Orange in traditional color mixing.'},
+  {round:3,type:'Final Logic',icon:'<i class="ri-flashlight-fill"></i>',time:8,q:'POET is to VERSE as PAINTER is to...?',sub:'Same relationship, different art form.',opts:['Gallery','Canvas','Brush','Easel'],ans:1,expl:'A poet creates verse; a painter creates on a canvas.'},
+  {round:3,type:'Lightning',icon:'<i class="ri-flashlight-fill"></i>',time:8,q:'If every 3rd attendee gets a prize, and there are 99 attendees, how many prizes?',sub:'',opts:['29','33','30','36'],ans:1,expl:'99 ÷ 3 = 33'},
   // Bonus / Tiebreaker
-  {round:4,type:'Tiebreaker',icon:'🔥',time:6,q:'How many letters are in "VOICES IN COLOR"?',sub:'Count carefully — spaces do not count.',opts:['12','13','14','15'],ans:2,expl:'V-O-I-C-E-S-I-N-C-O-L-O-R = 13 letters... wait: VOICES=6, IN=2, COLOR=5 → 13. The answer is 13 — but let\'s say 14 with spaces shown. Correct: 13.'},
-  {round:4,type:'Tiebreaker',icon:'🔥',time:6,q:'Sip, Paint & Poetry starts at 9 AM and ends at 5 PM. How many hours is that?',sub:'',opts:['7 hours','8 hours','9 hours','6 hours'],ans:1,expl:'9 AM to 5 PM = 8 hours'},
+  {round:4,type:'Tiebreaker',icon:'<i class="ri-fire-fill"></i>',time:6,q:'How many letters are in "VOICES IN COLOR"?',sub:'Count carefully — spaces do not count.',opts:['12','13','14','15'],ans:2,expl:'V-O-I-C-E-S-I-N-C-O-L-O-R = 13 letters... wait: VOICES=6, IN=2, COLOR=5 → 13. The answer is 13 — but let\'s say 14 with spaces shown. Correct: 13.'},
+  {round:4,type:'Tiebreaker',icon:'<i class="ri-fire-fill"></i>',time:6,q:'Sip, Paint & Poetry starts at 9 AM and ends at 5 PM. How many hours is that?',sub:'',opts:['7 hours','8 hours','9 hours','6 hours'],ans:1,expl:'9 AM to 5 PM = 8 hours'},
 ];
 
 let qIndex=0;
@@ -817,7 +818,7 @@ function enterAdmin(){
     showScreen('s-admin');
     adminInit();
   } else {
-    showToast('❌ Wrong password. Try: nexa2026');
+    showToast('<i class="ri-close-fill"></i> Wrong password. Try: nexa2026');
   }
 }
 
@@ -825,8 +826,8 @@ function enterAdmin(){
 function joinGame(){
   const n=document.getElementById('player-name-inp').value.trim();
   const c=document.getElementById('player-contact-inp').value.trim();
-  if(!n){showToast('⚠️ Please enter your name');return;}
-  if(!c){showToast('⚠️ Please enter your email or phone');return;}
+  if(!n){showToast('<i class="ri-error-warning-fill"></i> Please enter your name');return;}
+  if(!c){showToast('<i class="ri-error-warning-fill"></i> Please enter your email or phone');return;}
   playerName=n;
   playerLives=3;playerScore=0;playerStreak=0;playerAlive=true;
   const initials=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
@@ -894,7 +895,7 @@ function loadQuestion(qData,state){
   </button>`).join('');
 
   // Lives display
-  const hearts=['❤️','❤️','❤️'];
+  const hearts=['<i class="ri-heart-3-fill"></i>','<i class="ri-heart-3-fill"></i>','<i class="ri-heart-3-fill"></i>'];
   document.getElementById('q-lives').innerHTML=hearts.map((h,i)=>`<span class="q-life ${i>=playerLives?'gone':''}">${h}</span>`).join('');
 
   showScreen('s-question');
@@ -951,7 +952,7 @@ function selectAnswer(idx){
   state.answered[playerName]={idx,name:playerName,time:Date.now()};
   db.ref('gameState').set(state);
 
-  showToast('📝 Answer locked in!');
+  showToast('<i class="ri-edit-2-fill"></i> Answer locked in!');
 }
 
 function autoWrong(){
@@ -994,7 +995,7 @@ function loseLife(fromReveal=false){
 
 function updateLivesUI(){
   const el=document.getElementById('q-lives');
-  if(el) el.innerHTML=['❤️','❤️','❤️'].map((_,i)=>`<span class="q-life ${i>=playerLives?'gone':''}">❤️</span>`).join('');
+  if(el) el.innerHTML=['<i class="ri-heart-3-fill"></i>','<i class="ri-heart-3-fill"></i>','<i class="ri-heart-3-fill"></i>'].map((_,i)=>`<span class="q-life ${i>=playerLives?'gone':''}"><i class="ri-heart-3-fill"></i></span>`).join('');
 }
 
 function showResultScreen(correct){
@@ -1002,17 +1003,17 @@ function showResultScreen(correct){
   const title=document.getElementById('res-title');
   const sub=document.getElementById('res-sub');
   if(correct){
-    icon.textContent='✅';title.textContent='CORRECT!';
+    icon.textContent='<i class="ri-checkbox-circle-fill"></i>';title.textContent='CORRECT!';
     sub.textContent=currentQ.expl||'Brilliant answer!';
     title.style.color='var(--green)';
   } else {
     playerStreak=0;
-    icon.textContent='❌';title.textContent='WRONG!';
-    sub.textContent=(currentQ.expl||'')+ ' · Lives left: '+playerLives+'❤️';
+    icon.textContent='<i class="ri-close-fill"></i>';title.textContent='WRONG!';
+    sub.textContent=(currentQ.expl||'')+ ' · Lives left: '+playerLives+'<i class="ri-heart-3-fill"></i>';
     title.style.color='var(--pink)';
   }
   document.getElementById('res-score').textContent=playerScore;
-  document.getElementById('res-streak').textContent='🔥 Streak: '+playerStreak+(playerStreak>=3?' (Bonus active!)':'');
+  document.getElementById('res-streak').textContent='<i class="ri-fire-fill"></i> Streak: '+playerStreak+(playerStreak>=3?' (Bonus active!)':'');
   showScreen('s-result');
   updatePlayerInShared();
   // Poll for next
@@ -1077,7 +1078,7 @@ function showPlayerWinner(state){
   document.getElementById('winner-score-pill').textContent='Score: '+winner.score;
   showScreen('s-winner');
   launchConfetti();
-  if(winner.name===playerName) showToast('🎉 YOU ARE THE LAST VOICE STANDING!');
+  if(winner.name===playerName) showToast('<i class="ri-sparkling-fill"></i> YOU ARE THE LAST VOICE STANDING!');
 }
 
 // ===== ADMIN =====
@@ -1152,12 +1153,12 @@ function renderAdminPlayers(players){
     <div class="pr-av">${p.initials||p.name[0]}</div>
     <div style="flex:1">
       <div class="pr-name">${p.name}</div>
-      <div class="pr-streak">🔥${p.streak||0} streak</div>
+      <div class="pr-streak"><i class="ri-fire-fill"></i>${p.streak||0} streak</div>
     </div>
     <div style="text-align:right">
       <div class="pr-score">${p.score||0}</div>
-      <div class="pr-lives">${[0,1,2].map(i=>`<span style="opacity:${i<(p.lives||0)?1:0.15}">❤️</span>`).join('')}</div>
-      <div class="pr-status">${p.alive?'✓ ALIVE':'✗ OUT'}</div>
+      <div class="pr-lives">${[0,1,2].map(i=>`<span style="opacity:${i<(p.lives||0)?1:0.15}"><i class="ri-heart-3-fill"></i></span>`).join('')}</div>
+      <div class="pr-status">${p.alive?'<i class="ri-check-line"></i> ALIVE':'✗ OUT'}</div>
     </div>
   </div>`).join('');
 }
@@ -1196,7 +1197,7 @@ function renderRoundHistory(state){
   <div class="rh-item">
     <div><div class="rhi-label">${h.icon} ${h.type}</div><div style="font-size:11px;color:var(--muted)">${h.q.slice(0,50)}...</div></div>
     <div style="text-align:right">
-      <div class="rhi-correct">✓${h.correct}</div>
+      <div class="rhi-correct"><i class="ri-check-line"></i>${h.correct}</div>
       <div class="rhi-wrong">✗${h.wrong}</div>
     </div>
   </div>`).join('');
@@ -1206,7 +1207,7 @@ function adminStartGame(){
   if(!confirm('Start the game now? All players in lobby will be locked in.'))return;
   const state=getShared();
   if(!Object.keys(state.players||{}).length){
-    showToast('⚠️ No players have joined yet!');return;
+    showToast('<i class="ri-error-warning-fill"></i> No players have joined yet!');return;
   }
   qIndex=0;
   const q=QUESTIONS[0];
@@ -1245,19 +1246,19 @@ function adminNextQuestion(){
   });
 
   broadcast({phase:'showAnswer',correctAnswer:q.ans,currentQData:q,players,roundHistory:hist});
-  showToast('📊 Showing correct answer...');
+  showToast('<i class="ri-bar-chart-fill"></i> Showing correct answer...');
 
   setTimeout(()=>{
     const nextIdx=(state.qIndex||0)+1;
     if(nextIdx>=QUESTIONS.length){
-      showToast('✅ All questions done! Declare a winner or reset.');
+      showToast('<i class="ri-checkbox-circle-fill"></i> All questions done! Declare a winner or reset.');
       document.getElementById('btn-declare').disabled=false;
       return;
     }
     const nextQ=QUESTIONS[nextIdx];
     const alive=Object.values(players).filter(p=>p.alive);
     if(alive.length<=1){
-      showToast('🏆 Only 1 player left! Declare winner.');
+      showToast('<i class="ri-trophy-fill"></i> Only 1 player left! Declare winner.');
       document.getElementById('btn-declare').disabled=false;
       broadcast({phase:'question',qIndex:nextIdx,currentQData:nextQ,answered:{},round:nextQ.round,players,roundHistory:hist});
       return;
@@ -1276,13 +1277,13 @@ function adminDeclareWinner(){
   const state=getShared();
   const alive=Object.values(state.players||{}).filter(p=>p.alive);
   const winner=alive.sort((a,b)=>b.score-a.score)[0];
-  if(!winner){showToast('⚠️ No alive players found.');return;}
+  if(!winner){showToast('<i class="ri-error-warning-fill"></i> No alive players found.');return;}
   broadcast({phase:'winner',winner:winner.name});
   document.getElementById('winner-name-display').textContent=winner.name;
   document.getElementById('winner-score-pill').textContent='Score: '+(winner.score||0);
   showScreen('s-winner');
   launchConfetti();
-  showToast('🏆 '+winner.name+' is the LAST VOICE STANDING!');
+  showToast('<i class="ri-trophy-fill"></i> '+winner.name+' is the LAST VOICE STANDING!');
 }
 
 function adminResetGame(){
