@@ -43,7 +43,7 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [password, setPassword] = useState('');
   
   // State for live session
