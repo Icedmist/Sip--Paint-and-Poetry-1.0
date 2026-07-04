@@ -1,6 +1,23 @@
 import { useState, useEffect } from 'react';
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, set } from "firebase/database";
+import { getDatabase, ref, onValue, set, update } from "firebase/database";
+
+const QUESTIONS = [
+  {round:1,type:'Poetry Logic',icon:'<i class="ri-mic-fill"></i>',time:15,q:'A poet writes one poem every 2 days. How many poems will they write in June?',sub:'June has 30 days.',opts:['12 poems','15 poems','30 poems','6 poems'],ans:1,expl:'30 days ÷ 2 = 15 poems'},
+  {round:1,type:'Color Pattern',icon:'<i class="ri-palette-fill"></i>',time:15,q:'What color comes next in the pattern?',sub:'',pattern:['🔴','🟡','🟢','🔴','🟡','?'],opts:['🔴 Red','🟡 Yellow','🟢 Green','🔵 Blue'],ans:2,expl:'Pattern: Red→Yellow→Green repeats. Next is Green.'},
+  {round:1,type:'Word Scramble',icon:'<i class="ri-pen-nib-fill"></i>',time:20,q:'Unscramble this word related to today\'s event:',sub:'TIYPORE',opts:['POETRY','PAINTER','TROPHY','RIOTER'],ans:0,expl:'TIYPORE → POETRY'},
+  {round:1,type:'Nigerian Art',icon:'<i class="ri-flag-fill"></i>',time:15,q:'Which of these is a traditional Hausa art form?',sub:'Think about the culture of northern Nigeria.',opts:['Ukara weaving','Adire dyeing','Leather embossing','Nsibidi writing'],ans:2,expl:'Leather embossing (Tuareg/Hausa leather work) is iconic to northern Nigeria.'},
+  {round:2,type:'Logic Puzzle',icon:'<i class="ri-puzzle-fill"></i>',time:12,q:'If RED=3, BLUE=4, GREEN=5, what does ORANGE equal?',sub:'Count the letters.',opts:['5','6','7','4'],ans:1,expl:'ORANGE has 6 letters → 6'},
+  {round:2,type:'Color Pattern',icon:'<i class="ri-palette-fill"></i>',time:12,q:'What is the missing number?',sub:'2 → 4 → 8 → ? → 32',pattern:['2','4','8','?','32'],opts:['12','14','16','10'],ans:2,expl:'Each number doubles: 8 × 2 = 16'},
+  {round:2,type:'Poetry Trivia',icon:'<i class="ri-mic-fill"></i>',time:15,q:'Which literary device repeats the same sound at the start of nearby words?',sub:'E.g. "Sip, Swirl, Speak"',opts:['Metaphor','Alliteration','Simile','Assonance'],ans:1,expl:'Alliteration is the repetition of initial consonant sounds.'},
+  {round:2,type:'Quick Math',icon:'<i class="ri-flashlight-fill"></i>',time:10,q:'An art gallery has 7 rows of paintings with 9 paintings each. 15 are sold. How many remain?',sub:'',opts:['48','63','58','46'],ans:0,expl:'7×9=63, 63-15=48'},
+  {round:3,type:'Advanced Logic',icon:'<i class="ri-trophy-fill"></i>',time:10,q:'A rhythm has: CLAP SNAP STOMP CLAP SNAP STOMP CLAP. What comes next?',sub:'Find the repeating beat pattern.',pattern:['👏','🫰','🦶','👏','🫰','🦶','👏','?'],opts:['👏 CLAP','🫰 SNAP','🦶 STOMP','<i class="ri-rhythm-fill"></i> BEAT'],ans:1,expl:'CLAP→SNAP→STOMP repeats. After CLAP comes SNAP.'},
+  {round:3,type:'Color Theory',icon:'<i class="ri-palette-fill"></i>',time:10,q:'Which two primary colors mix to make ORANGE?',sub:'Think about paint, not light.',opts:['Red + Blue','Yellow + Blue','Red + Yellow','Red + Green'],ans:2,expl:'Red + Yellow = Orange in traditional color mixing.'},
+  {round:3,type:'Final Logic',icon:'<i class="ri-flashlight-fill"></i>',time:8,q:'POET is to VERSE as PAINTER is to...?',sub:'Same relationship, different art form.',opts:['Gallery','Canvas','Brush','Easel'],ans:1,expl:'A poet creates verse; a painter creates on a canvas.'},
+  {round:3,type:'Lightning',icon:'<i class="ri-flashlight-fill"></i>',time:8,q:'If every 3rd attendee gets a prize, and there are 99 attendees, how many prizes?',sub:'',opts:['29','33','30','36'],ans:1,expl:'99 ÷ 3 = 33'},
+  {round:4,type:'Tiebreaker',icon:'<i class="ri-fire-fill"></i>',time:6,q:'How many letters are in "VOICES IN COLOR"?',sub:'Count carefully — spaces do not count.',opts:['12','13','14','15'],ans:2,expl:'V-O-I-C-E-S-I-N-C-O-L-O-R = 13 letters... wait: VOICES=6, IN=2, COLOR=5 → 13. The answer is 13 — but let\'s say 14 with spaces shown. Correct: 13.'},
+  {round:4,type:'Tiebreaker',icon:'<i class="ri-fire-fill"></i>',time:6,q:'Sip, Paint & Poetry starts at 9 AM and ends at 5 PM. How many hours is that?',sub:'',opts:['7 hours','8 hours','9 hours','6 hours'],ans:1,expl:'9 AM to 5 PM = 8 hours'},
+];
 
 const firebaseConfig = {
   apiKey: "AIzaSyBXYVqnK9R5Jz7oa2cHXmrbqNlC2XhXJho",
@@ -22,7 +39,8 @@ export default function App() {
   const [speakerNote, setSpeakerNote] = useState('');
   
   // State for games
-  const [gamePhase, setGamePhase] = useState('Lobby');
+  const [gamePhase, setGamePhase] = useState('lobby');
+  const [gameState, setGameState] = useState({});
 
   // State for partners
   const [partners, setPartners] = useState('');
@@ -48,7 +66,8 @@ export default function App() {
     const unsubscribeGame = onValue(gameRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        setGamePhase(data.phase || 'Lobby');
+        setGamePhase(data.phase || 'lobby');
+        setGameState(data);
       }
     });
 
@@ -102,12 +121,93 @@ export default function App() {
     });
   };
 
-  const updateGamePhase = (newPhase) => {
-    set(ref(db, 'gameState'), {
-      phase: newPhase,
+  const startGame = () => {
+    if (!window.confirm('Start the game now? All players in lobby will be locked in.')) return;
+    const q = QUESTIONS[0];
+    const newPlayers = { ...gameState.players };
+    Object.values(newPlayers).forEach(p => {
+      p.alive = true; p.lives = 3; p.score = 0; p.streak = 0;
+    });
+
+    update(ref(db, 'gameState'), {
+      phase: 'question',
+      gameStarted: true,
+      qIndex: 0,
+      currentQData: q,
+      answered: {},
+      round: 1,
+      roundHistory: [],
+      players: newPlayers,
       timestamp: Date.now()
-    }).then(() => {
-      setGamePhase(newPhase);
+    }).then(() => alert('Game started! Round 1 is live.'));
+  };
+
+  const nextQuestion = () => {
+    const qIndex = gameState.qIndex || 0;
+    const q = QUESTIONS[qIndex];
+    if (!q) return;
+
+    const answered = Object.values(gameState.answered || {});
+    const correct = answered.filter(a => a.idx === q.ans).length;
+    const wrong = answered.length - correct;
+    const hist = [...(gameState.roundHistory || []), { icon: q.icon, type: q.type, q: q.q, correct, wrong }];
+
+    const players = { ...gameState.players };
+    Object.keys(players).forEach(name => {
+      if (!players[name].alive) return;
+      const a = gameState.answered?.[name];
+      if (!a || a.idx !== q.ans) {
+        players[name].lives = (players[name].lives || 3) - 1;
+        if (players[name].lives <= 0) players[name].alive = false;
+      } else {
+        players[name].score = (players[name].score || 0) + 100;
+        players[name].streak = (players[name].streak || 0) + 1;
+      }
+    });
+
+    update(ref(db, 'gameState'), {
+      phase: 'showAnswer',
+      correctAnswer: q.ans,
+      currentQData: q,
+      players,
+      roundHistory: hist,
+      timestamp: Date.now()
+    });
+    
+    setTimeout(() => {
+      const nextIdx = qIndex + 1;
+      if (nextIdx >= QUESTIONS.length) {
+        alert('All questions done!');
+        return;
+      }
+      const nextQ = QUESTIONS[nextIdx];
+      update(ref(db, 'gameState'), {
+        phase: 'question',
+        qIndex: nextIdx,
+        currentQData: nextQ,
+        answered: {},
+        round: nextQ.round,
+        players,
+        roundHistory: hist,
+        timestamp: Date.now()
+      });
+    }, 3000);
+  };
+
+  const showAd = () => {
+    update(ref(db, 'gameState'), { phase: 'ad', timestamp: Date.now() });
+  };
+
+  const declareWinner = () => {
+    update(ref(db, 'gameState'), { phase: 'winner', timestamp: Date.now() });
+  };
+
+  const resetGame = () => {
+    if (!window.confirm('Reset game to lobby?')) return;
+    update(ref(db, 'gameState'), {
+      phase: 'lobby',
+      gameStarted: false,
+      timestamp: Date.now()
     });
   };
 
@@ -129,7 +229,7 @@ export default function App() {
   const handleAddPresenter = () => {
     const newP = {
       name: 'New Presenter', nickname: 'Nickname', role: 'Role', bio: 'Bio here...',
-      photo: null, photoEmoji: '<i className="ri-mic-fill"></i>', slot: '10:00 AM', live: false,
+      photo: null, photoEmoji: '<i class="ri-mic-fill"></i>', slot: '10:00 AM', live: false,
       gradient: 'linear-gradient(160deg,#d4cfc9,#b8b3ad)'
     };
     updatePresenters([...presenters, newP]);
@@ -199,13 +299,20 @@ export default function App() {
 
         <section className="card">
           <h2>Game Master Control</h2>
-          <p>Current Phase: <strong>{gamePhase}</strong></p>
-          <div className="btn-group">
-            <button onClick={() => updateGamePhase('Lobby')} className={gamePhase === 'Lobby' ? 'active' : ''}>Lobby</button>
-            <button onClick={() => updateGamePhase('Question')} className={gamePhase === 'Question' ? 'active' : ''}>Question</button>
-            <button onClick={() => updateGamePhase('Reveal')} className={gamePhase === 'Reveal' ? 'active' : ''}>Reveal</button>
-            <button onClick={() => updateGamePhase('Winner')} className={gamePhase === 'Winner' ? 'active' : ''}>Winner</button>
+          <p>Current Phase: <strong style={{textTransform:'capitalize'}}>{gamePhase}</strong></p>
+          <div className="btn-group" style={{ flexWrap: 'wrap' }}>
+            <button onClick={startGame} className="btn-primary" disabled={gameState.gameStarted}>Start Game</button>
+            <button onClick={nextQuestion} className="btn-primary" disabled={!gameState.gameStarted || gamePhase === 'lobby'}>Reveal & Next Question</button>
+            <button onClick={showAd} className="btn-primary" disabled={!gameState.gameStarted}>Show Ad</button>
+            <button onClick={declareWinner} className="btn-primary" disabled={!gameState.gameStarted}>Declare Winner</button>
+            <button onClick={resetGame} style={{ background: '#E8386D', color: 'white', border: 'none', borderRadius: '4px', padding: '8px 16px', cursor: 'pointer' }}>Reset Game</button>
           </div>
+          {gameState.gameStarted && (
+            <div style={{ marginTop: '15px', padding: '12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+              <p style={{margin: '0 0 5px 0'}}><strong>Round:</strong> {gameState.round} | <strong>Question:</strong> {(gameState.qIndex || 0) + 1} / {QUESTIONS.length}</p>
+              <p style={{margin: '0'}}><strong>Alive Players:</strong> {Object.values(gameState.players || {}).filter(p => p.alive).length} / {Object.values(gameState.players || {}).length}</p>
+            </div>
+          )}
         </section>
 
         <section className="card">

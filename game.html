@@ -353,107 +353,7 @@ body{
 .winner-nexa{font-size:11px;color:var(--nexa);letter-spacing:1px;z-index:2;margin-top:8px;}
 #confetti-canvas{position:absolute;inset:0;pointer-events:none;z-index:3;}
 
-/* ===== ADMIN SCREENS ===== */
-#s-admin{z-index:1;flex-direction:column;overflow:hidden;}
-.admin-bar{
-  background:rgba(200,146,42,0.08);
-  border-bottom:1px solid rgba(200,146,42,0.2);
-  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
-  flex-shrink:0;
-}
-.admin-bar-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--gold);}
-.admin-status{font-size:11px;color:var(--muted);letter-spacing:1px;}
-.admin-body{flex:1;overflow-y:auto;padding:16px;}
 
-/* Admin tabs */
-.admin-tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--bg3);border-radius:10px;padding:4px;}
-.a-tab{
-  flex:1;background:none;border:none;color:var(--muted);
-  padding:9px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;
-  border-radius:8px;cursor:pointer;letter-spacing:0.5px;
-  transition:all 0.2s;
-}
-.a-tab.active{background:var(--bg4);color:var(--off);}
-
-/* Players list */
-.players-list{display:flex;flex-direction:column;gap:8px;}
-.player-row{
-  background:var(--bg3);border-radius:10px;
-  padding:12px 14px;display:flex;align-items:center;gap:10px;
-  border:1px solid rgba(255,255,255,0.05);
-  transition:border-color 0.2s;
-}
-.player-row.alive{border-color:rgba(46,187,90,0.2);}
-.player-row.dead{opacity:0.4;}
-.player-row.dead .pr-status{color:var(--pink);}
-.pr-av{
-  width:36px;height:36px;border-radius:50%;
-  background:linear-gradient(135deg,var(--orange-d),var(--orange));
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',sans-serif;font-size:14px;color:white;
-  flex-shrink:0;
-}
-.pr-name{font-weight:600;font-size:14px;flex:1;}
-.pr-score{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);}
-.pr-status{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--green);}
-.pr-streak{font-size:11px;color:var(--orange);}
-.pr-lives{display:flex;gap:2px;font-size:14px;}
-
-/* Admin stats */
-.admin-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-.a-stat{
-  background:var(--bg3);border-radius:10px;padding:14px;text-align:center;
-  border:1px solid rgba(255,255,255,0.05);
-}
-.a-stat-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--off);line-height:1;}
-.a-stat-label{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
-
-/* Admin controls */
-.admin-controls{display:flex;flex-direction:column;gap:10px;}
-.admin-round-info{
-  background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);
-  border-radius:12px;padding:16px;
-}
-.ari-round{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--orange);letter-spacing:2px;}
-.ari-q{font-size:13px;color:var(--off);font-weight:500;margin:4px 0 2px;}
-.ari-type{font-size:11px;color:var(--muted);}
-.a-btn{
-  border:none;padding:15px;border-radius:12px;
-  font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;
-  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
-  transition:transform 0.15s,opacity 0.2s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-}
-.a-btn:active{transform:scale(0.97);}
-.a-btn-start{background:linear-gradient(135deg,var(--orange-d),var(--orange));color:white;box-shadow:0 6px 20px rgba(255,107,53,0.3);}
-.a-btn-next{background:linear-gradient(135deg,var(--green-d),var(--green));color:var(--bg);box-shadow:0 6px 20px rgba(46,187,90,0.3);}
-.a-btn-ad{background:linear-gradient(135deg,#1A4A2E,var(--nexa-d));color:var(--green);border:1px solid rgba(46,187,90,0.2);}
-.a-btn-end{background:linear-gradient(135deg,#6B1D1D,#a83232);color:#ff9999;border:1px solid rgba(232,56,109,0.2);}
-.a-btn-winner{background:linear-gradient(135deg,#4A3700,var(--gold));color:var(--bg);box-shadow:0 6px 20px rgba(200,146,42,0.3);}
-.a-btn:disabled{opacity:0.35;cursor:not-allowed;}
-
-/* Live answer tracker in admin */
-.live-answers{
-  background:var(--bg3);border-radius:10px;padding:12px;
-  border:1px solid rgba(255,255,255,0.05);
-}
-.la-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
-.answer-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.ab-label{font-size:12px;font-weight:600;min-width:18px;}
-.ab-track{flex:1;height:6px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
-.ab-fill{height:100%;border-radius:3px;transition:width 0.5s ease;background:var(--orange);}
-.ab-count{font-size:12px;color:var(--muted);min-width:20px;text-align:right;}
-
-/* Round history */
-.round-history{display:flex;flex-direction:column;gap:6px;}
-.rh-item{
-  background:var(--bg3);border-radius:8px;padding:10px 12px;
-  display:flex;align-items:center;justify-content:space-between;
-  border:1px solid rgba(255,255,255,0.04);
-}
-.rhi-label{font-size:12px;font-weight:600;}
-.rhi-correct{font-size:11px;color:var(--green);}
-.rhi-wrong{font-size:11px;color:var(--pink);}
 
 /* ===== PROGRESS BAR (top of question screen) ===== */
 .q-progress{
@@ -505,12 +405,7 @@ body{
   </div>
   <div class="role-sub">Pick your role to begin</div>
   <div class="role-cards">
-    <div class="role-card admin-card" onclick="enterAdmin()">
-      <div class="role-icon"><i class="ri-vip-crown-fill"></i></div>
-      <div class="role-label" style="color:var(--gold);">Admin</div>
-      <div class="role-desc">Control the game, manage rounds, see all players</div>
-    </div>
-    <div class="role-card player-card" onclick="showScreen('s-join')">
+    <div class="role-card player-card" onclick="showScreen('s-join')" style="grid-column: 1 / -1;">
       <div class="role-icon"><i class="ri-mic-fill"></i></div>
       <div class="role-label" style="color:var(--orange);">Player</div>
       <div class="role-desc">Join the game on your phone and play to win</div>
@@ -656,63 +551,7 @@ body{
   <div class="winner-nexa">Game powered by Nexa Digital Solutions Ltd</div>
 </div>
 
-<!-- ===== ADMIN ===== -->
-<div class="screen" id="s-admin">
-  <div class="admin-bar">
-    <div>
-      <div class="admin-bar-title">🎮 GAME MASTER</div>
-      <div class="admin-status" id="admin-status">Waiting to start · <span id="admin-player-count">0</span> players</div>
-    </div>
-    <button onclick="showScreen('s-role')" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--muted);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;">Exit</button>
-  </div>
-  <div class="admin-body">
-    <div class="admin-tabs">
-      <button class="a-tab active" onclick="adminTab('control')">Control</button>
-      <button class="a-tab" onclick="adminTab('players')">Players</button>
-      <button class="a-tab" onclick="adminTab('rounds')">Rounds</button>
-    </div>
 
-    <!-- Control Tab -->
-    <div id="admin-tab-control">
-      <div class="admin-stats">
-        <div class="a-stat"><div class="a-stat-num" id="as-alive">0</div><div class="a-stat-label">Alive</div></div>
-        <div class="a-stat"><div class="a-stat-num" id="as-total">0</div><div class="a-stat-label">Total Players</div></div>
-        <div class="a-stat"><div class="a-stat-num" id="as-round">0</div><div class="a-stat-label">Round</div></div>
-        <div class="a-stat"><div class="a-stat-num" id="as-q">0</div><div class="a-stat-label">Question</div></div>
-      </div>
-      <div class="admin-round-info" id="admin-round-info">
-        <div class="ari-round" id="ari-round">ROUND 1 · QUESTION 1</div>
-        <div class="ari-q" id="ari-q">Press Start Game to begin</div>
-        <div class="ari-type" id="ari-type">3 lives per player · 15 seconds per question</div>
-      </div>
-      <div class="live-answers" id="live-answers" style="display:none;">
-        <div class="la-title">Live Answer Distribution</div>
-        <div id="answer-bars"></div>
-      </div>
-      <div class="admin-controls" style="margin-top:12px;">
-        <button class="a-btn a-btn-start" id="btn-start" onclick="adminStartGame()">▶ Start Game</button>
-        <button class="a-btn a-btn-next" id="btn-next" onclick="adminNextQuestion()" disabled>⏭ Next Question</button>
-        <button class="a-btn a-btn-ad" id="btn-ad" onclick="adminShowAd()" disabled>📺 Show Nexa Ad Break</button>
-        <button class="a-btn a-btn-winner" id="btn-declare" onclick="adminDeclareWinner()" disabled><i class="ri-trophy-fill"></i> Declare Winner</button>
-        <button class="a-btn a-btn-end" onclick="adminResetGame()">↺ Reset Game</button>
-      </div>
-    </div>
-
-    <!-- Players Tab -->
-    <div id="admin-tab-players" style="display:none;">
-      <div class="players-list" id="admin-players-list">
-        <div style="color:var(--muted);text-align:center;padding:30px;font-size:14px;">No players yet. Waiting for participants to join...</div>
-      </div>
-    </div>
-
-    <!-- Rounds Tab -->
-    <div id="admin-tab-rounds" style="display:none;">
-      <div class="round-history" id="round-history">
-        <div style="color:var(--muted);text-align:center;padding:20px;font-size:13px;">Round history will appear here</div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div id="toast"></div>
 
@@ -811,16 +650,6 @@ function showScreen(id){
   document.getElementById(id).classList.add('active');
 }
 
-// ===== ADMIN LOGIN =====
-function enterAdmin(){
-  const pw=prompt('Admin Password:');
-  if(pw==='nexa2026'||pw==='admin'){
-    showScreen('s-admin');
-    adminInit();
-  } else {
-    showToast('<i class="ri-close-fill"></i> Wrong password. Try: nexa2026');
-  }
-}
 
 // ===== PLAYER JOIN =====
 function joinGame(){
@@ -839,11 +668,8 @@ function joinGame(){
     joined: Date.now()
   });
 
-  // Register in shared state
-  const state=getShared();
-  if(!state.players)state.players={};
-  state.players[n]={name:n,lives:3,score:0,streak:0,alive:true,initials,joined:Date.now()};
-  db.ref('gameState').set(state);
+  // Register in shared state safely without wiping everything
+  db.ref('gameState/players/' + n).set({name:n,lives:3,score:0,streak:0,alive:true,initials,joined:Date.now()});
 
   document.getElementById('lobby-av').textContent=initials;
   document.getElementById('lobby-name-display').textContent=n;
@@ -946,11 +772,8 @@ function selectAnswer(idx){
   document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
   document.getElementById('opt-'+idx).style.borderColor='rgba(200,146,42,0.6)';
 
-  // Record answer in shared
-  const state=getShared();
-  if(!state.answered)state.answered={};
-  state.answered[playerName]={idx,name:playerName,time:Date.now()};
-  db.ref('gameState').set(state);
+  // Record answer safely
+  db.ref('gameState/answered/' + playerName).set({idx,name:playerName,time:Date.now()});
 
   showToast('<i class="ri-edit-2-fill"></i> Answer locked in!');
 }
@@ -1031,13 +854,13 @@ function nextFromResult(){
 }
 
 function updatePlayerInShared(){
-  const state=getShared();
-  if(state.players && state.players[playerName]){
-    state.players[playerName].score=playerScore;
-    state.players[playerName].lives=playerLives;
-    state.players[playerName].streak=playerStreak;
-    state.players[playerName].alive=playerAlive;
-    db.ref('gameState').set(state);
+  if(playerName) {
+    db.ref('gameState/players/' + playerName).update({
+      score: playerScore,
+      lives: playerLives,
+      streak: playerStreak,
+      alive: playerAlive
+    });
   }
 }
 
@@ -1081,219 +904,6 @@ function showPlayerWinner(state){
   if(winner.name===playerName) showToast('<i class="ri-sparkling-fill"></i> YOU ARE THE LAST VOICE STANDING!');
 }
 
-// ===== ADMIN =====
-let adminPollInterval=null;
-let currentAdminTab='control';
-
-function adminInit(){
-  // Initialize shared state
-  const existing=getShared();
-  if(!existing.phase){
-    db.ref('gameState').set({phase:'lobby',round:1,qIndex:0,players:{},answered:{},roundHistory:[],gameStarted:false});
-  }
-  adminPoll();
-}
-
-function adminPoll(){
-  if(adminPollInterval)clearInterval(adminPollInterval);
-  adminPollInterval=setInterval(()=>{
-    const state=getShared();
-    updateAdminUI(state);
-  },600);
-}
-
-function updateAdminUI(state){
-  const players=Object.values(state.players||{});
-  const alive=players.filter(p=>p.alive);
-  const total=players.length;
-  document.getElementById('admin-player-count').textContent=total;
-  document.getElementById('as-alive').textContent=alive.length;
-  document.getElementById('as-total').textContent=total;
-  document.getElementById('as-round').textContent=state.round||1;
-  document.getElementById('as-q').textContent=(state.qIndex||0)+1;
-  document.getElementById('admin-status').textContent=`Phase: ${state.phase||'lobby'} · ${alive.length}/${total} alive`;
-
-  // Update players list
-  if(currentAdminTab==='players') renderAdminPlayers(players);
-
-  // Live answer tracking
-  if(state.phase==='question' && state.answered){
-    document.getElementById('live-answers').style.display='block';
-    renderAnswerBars(state.answered,state.currentQData);
-  } else {
-    document.getElementById('live-answers').style.display='none';
-  }
-
-  // Round info
-  const q=QUESTIONS[state.qIndex||0];
-  if(q){
-    document.getElementById('ari-round').textContent=`ROUND ${q.round} · QUESTION ${(state.qIndex||0)+1}/${QUESTIONS.length}`;
-    document.getElementById('ari-q').textContent=q.q.slice(0,80)+(q.q.length>80?'...':'');
-    document.getElementById('ari-type').textContent=q.icon+' '+q.type+' · '+q.time+'s';
-  }
-
-  // Buttons
-  const started=state.gameStarted;
-  document.getElementById('btn-start').disabled=started;
-  document.getElementById('btn-next').disabled=!started||state.phase==='lobby';
-  document.getElementById('btn-ad').disabled=!started;
-  document.getElementById('btn-declare').disabled=!started||alive.length>1;
-}
-
-function renderAdminPlayers(players){
-  const list=document.getElementById('admin-players-list');
-  if(!players.length){
-    list.innerHTML='<div style="color:var(--muted);text-align:center;padding:30px;font-size:14px;">No players yet...</div>';
-    return;
-  }
-  players.sort((a,b)=>b.score-a.score);
-  list.innerHTML=players.map((p,i)=>`
-  <div class="player-row ${p.alive?'alive':'dead'}">
-    <div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:var(--muted);min-width:20px;">${i+1}</div>
-    <div class="pr-av">${p.initials||p.name[0]}</div>
-    <div style="flex:1">
-      <div class="pr-name">${p.name}</div>
-      <div class="pr-streak"><i class="ri-fire-fill"></i>${p.streak||0} streak</div>
-    </div>
-    <div style="text-align:right">
-      <div class="pr-score">${p.score||0}</div>
-      <div class="pr-lives">${[0,1,2].map(i=>`<span style="opacity:${i<(p.lives||0)?1:0.15}"><i class="ri-heart-3-fill"></i></span>`).join('')}</div>
-      <div class="pr-status">${p.alive?'<i class="ri-check-line"></i> ALIVE':'✗ OUT'}</div>
-    </div>
-  </div>`).join('');
-}
-
-function renderAnswerBars(answered,qData){
-  if(!qData)return;
-  const counts=[0,0,0,0];
-  Object.values(answered).forEach(a=>{if(a.idx>=0&&a.idx<4)counts[a.idx]++;});
-  const total=counts.reduce((a,b)=>a+b,0)||1;
-  const letters=['A','B','C','D'];
-  document.getElementById('answer-bars').innerHTML=counts.map((c,i)=>`
-  <div class="answer-bar">
-    <span class="ab-label">${letters[i]}</span>
-    <div class="ab-track"><div class="ab-fill" style="width:${(c/total*100).toFixed(0)}%;background:${i===(qData.ans)?'var(--green)':'var(--orange)'}"></div></div>
-    <span class="ab-count">${c}</span>
-  </div>`).join('');
-}
-
-function adminTab(tab){
-  currentAdminTab=tab;
-  document.querySelectorAll('.a-tab').forEach(t=>t.classList.remove('active'));
-  event.target.classList.add('active');
-  ['control','players','rounds'].forEach(t=>{
-    const el=document.getElementById('admin-tab-'+t);
-    if(el)el.style.display=t===tab?'block':'none';
-  });
-  if(tab==='players'){const s=getShared();renderAdminPlayers(Object.values(s.players||{}));}
-  if(tab==='rounds'){renderRoundHistory(getShared());}
-}
-
-function renderRoundHistory(state){
-  const el=document.getElementById('round-history');
-  const hist=state.roundHistory||[];
-  if(!hist.length){el.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px;font-size:13px;">No rounds completed yet</div>';return;}
-  el.innerHTML=hist.map(h=>`
-  <div class="rh-item">
-    <div><div class="rhi-label">${h.icon} ${h.type}</div><div style="font-size:11px;color:var(--muted)">${h.q.slice(0,50)}...</div></div>
-    <div style="text-align:right">
-      <div class="rhi-correct"><i class="ri-check-line"></i>${h.correct}</div>
-      <div class="rhi-wrong">✗${h.wrong}</div>
-    </div>
-  </div>`).join('');
-}
-
-function adminStartGame(){
-  if(!confirm('Start the game now? All players in lobby will be locked in.'))return;
-  const state=getShared();
-  if(!Object.keys(state.players||{}).length){
-    showToast('<i class="ri-error-warning-fill"></i> No players have joined yet!');return;
-  }
-  qIndex=0;
-  const q=QUESTIONS[0];
-  broadcast({phase:'question',gameStarted:true,qIndex:0,currentQData:q,answered:{},round:1,roundHistory:[]});
-  document.getElementById('btn-start').disabled=true;
-  document.getElementById('btn-next').disabled=false;
-  document.getElementById('btn-ad').disabled=false;
-  showToast('🎮 Game started! Round 1 is live.');
-}
-
-function adminNextQuestion(){
-  const state=getShared();
-  // First reveal answer
-  const q=QUESTIONS[state.qIndex||0];
-  if(!q)return;
-
-  // Log round history
-  const answered=Object.values(state.answered||{});
-  const correct=answered.filter(a=>a.idx===q.ans).length;
-  const wrong=answered.length-correct;
-  const hist=[...(state.roundHistory||[]),{icon:q.icon,type:q.type,q:q.q,correct,wrong}];
-
-  // Eliminate players who answered wrong or didn't answer
-  const players={...state.players};
-  const answeredNames=new Set(Object.keys(state.answered||{}));
-  Object.keys(players).forEach(name=>{
-    if(!players[name].alive)return;
-    const a=state.answered?.[name];
-    if(!a||a.idx!==q.ans){
-      players[name].lives=(players[name].lives||3)-1;
-      if(players[name].lives<=0)players[name].alive=false;
-    } else {
-      players[name].score=(players[name].score||0)+100;
-      players[name].streak=(players[name].streak||0)+1;
-    }
-  });
-
-  broadcast({phase:'showAnswer',correctAnswer:q.ans,currentQData:q,players,roundHistory:hist});
-  showToast('<i class="ri-bar-chart-fill"></i> Showing correct answer...');
-
-  setTimeout(()=>{
-    const nextIdx=(state.qIndex||0)+1;
-    if(nextIdx>=QUESTIONS.length){
-      showToast('<i class="ri-checkbox-circle-fill"></i> All questions done! Declare a winner or reset.');
-      document.getElementById('btn-declare').disabled=false;
-      return;
-    }
-    const nextQ=QUESTIONS[nextIdx];
-    const alive=Object.values(players).filter(p=>p.alive);
-    if(alive.length<=1){
-      showToast('<i class="ri-trophy-fill"></i> Only 1 player left! Declare winner.');
-      document.getElementById('btn-declare').disabled=false;
-      broadcast({phase:'question',qIndex:nextIdx,currentQData:nextQ,answered:{},round:nextQ.round,players,roundHistory:hist});
-      return;
-    }
-    broadcast({phase:'question',qIndex:nextIdx,currentQData:nextQ,answered:{},round:nextQ.round,players,roundHistory:hist});
-    showToast(`⏭ Question ${nextIdx+1} is live!`);
-  },3000);
-}
-
-function adminShowAd(){
-  broadcast({phase:'ad'});
-  showToast('📺 Nexa ad break shown to all players!');
-}
-
-function adminDeclareWinner(){
-  const state=getShared();
-  const alive=Object.values(state.players||{}).filter(p=>p.alive);
-  const winner=alive.sort((a,b)=>b.score-a.score)[0];
-  if(!winner){showToast('<i class="ri-error-warning-fill"></i> No alive players found.');return;}
-  broadcast({phase:'winner',winner:winner.name});
-  document.getElementById('winner-name-display').textContent=winner.name;
-  document.getElementById('winner-score-pill').textContent='Score: '+(winner.score||0);
-  showScreen('s-winner');
-  launchConfetti();
-  showToast('<i class="ri-trophy-fill"></i> '+winner.name+' is the LAST VOICE STANDING!');
-}
-
-function adminResetGame(){
-  if(!confirm('Reset game? All player data will be cleared.'))return;
-  db.ref('gameState').remove();
-  if(adminPollInterval)clearInterval(adminPollInterval);
-  showScreen('s-admin');
-  adminInit();
-  showToast('↺ Game reset. Ready for new players.');
-}
 
 // ===== CONFETTI =====
 function launchConfetti(){
