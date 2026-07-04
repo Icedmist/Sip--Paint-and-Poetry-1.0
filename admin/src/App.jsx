@@ -107,7 +107,7 @@ export default function App() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    if (password === 'admin2026') {
+    if (password === 'cold@fedora1') {
       setIsAuthenticated(true);
     } else {
       alert('Incorrect Password');
