@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sip, Paint & Poetry — Unified Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #C8922A; 
+      --bg: #0D0D0D; 
+      --bg2: #161616;
+      --border: rgba(255, 255, 255, 0.08); 
+      --text: #F0EDE6; 
+      --muted: rgba(240, 237, 230, 0.4); 
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* Top Navigation Bar */
+    header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      flex-shrink: 0;
+    }
+    .brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-pill {
+      background: rgba(200, 146, 42, 0.15);
+      border: 1px solid rgba(200, 146, 42, 0.3);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-family: 'Poppins', sans-serif;
+      letter-spacing: 1px;
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      height: 100%;
+    }
+    .tab {
+      height: 100%;
+      padding: 0 24px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      position: relative;
+      transition: color 0.2s;
+    }
+    .tab:hover {
+      color: var(--text);
+    }
+    .tab.active {
+      color: var(--gold);
+    }
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gold);
+    }
+
+    /* Embedded Content Viewer */
+    main {
+      flex: 1;
+      position: relative;
+      background: var(--bg);
+    }
+    iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      SIP, PAINT & POETRY
+      <div class="brand-pill">UNIFIED</div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="loadPage('sip-paint-poetry (1).html', this)">🎤 Live Event</button>
+      <button class="tab" onclick="loadPage('pin-game.html', this)">🎮 Game Arena</button>
+      <button class="tab" onclick="loadPage('admin.html', this)">👑 Admin Dashboard</button>
+    </div>
+  </header>
+
+  <main>
+    <iframe id="content-frame" src="sip-paint-poetry (1).html"></iframe>
+  </main>
+
+  <script>
+    function loadPage(url, btn) {
+      document.getElementById('content-frame').src = url;
+      
+      // Update active tab styles
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>

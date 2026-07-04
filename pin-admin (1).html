@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PIN Admin — Sip, Paint & Poetry 1.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{
+  --gold:#C8922A; --gold-l:#F5C842; --green:#1A7A3C; --green-l:#2EBB5A;
+  --bg:#0D0D0D; --bg2:#161616; --bg3:#1E1E1E; --bg4:#272727;
+  --border:rgba(255,255,255,0.08); --border-gold:rgba(200,146,42,0.3);
+  --text:#F0EDE6; --muted:rgba(240,237,230,0.4); --pink:#E8386D; --cyan:#00C9B8;
+  --danger:#E84040; --success:#2EBB5A;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+/* ===== LOGIN ===== */
+#login-screen{
+  position:fixed;inset:0;z-index:999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+}
+#login-screen.hide{display:none;}
+.login-box{
+  width:100%;max-width:400px;
+  background:var(--bg2);
+  border:1px solid var(--border-gold);
+  border-radius:16px;padding:48px 40px;
+  text-align:center;
+}
+.login-logo{
+  width:72px;height:72px;border-radius:50%;
+  background:rgba(200,146,42,0.12);border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 24px;font-size:28px;
+}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--gold);margin-bottom:4px;}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:32px;}
+.login-input{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  color:var(--text);padding:14px 16px;border-radius:8px;
+  font-family:'Poppins',sans-serif;font-size:15px;margin-bottom:14px;
+  outline:none;transition:border-color 0.2s;
+}
+.login-input:focus{border-color:var(--gold);}
+.login-btn{
+  width:100%;background:linear-gradient(135deg,var(--gold),var(--gold-l));
+  color:#0D0D0D;border:none;padding:15px;border-radius:8px;
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  transition:transform 0.15s,opacity 0.2s;
+}
+.login-btn:hover{transform:scale(1.02);}
+.login-err{color:var(--danger);font-size:13px;margin-top:10px;display:none;}
+
+/* ===== SHELL ===== */
+#app{display:flex;flex:1;height:100vh;overflow:hidden;}
+
+/* ===== SIDEBAR ===== */
+aside{
+  width:240px;flex-shrink:0;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  height:100vh;overflow-y:auto;
+}
+.sb-brand{
+  padding:24px 20px 20px;
+  border-bottom:1px solid var(--border);
+}
+.sb-brand-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--gold);}
+.sb-brand-sub{font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+.sb-nav{flex:1;padding:16px 0;}
+.sb-section{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:12px 20px 6px;}
+.sb-item{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 20px;cursor:pointer;
+  font-size:14px;font-weight:500;color:var(--muted);
+  transition:all 0.15s;border-left:3px solid transparent;
+  margin:1px 0;
+}
+.sb-item:hover{color:var(--text);background:rgba(255,255,255,0.03);}
+.sb-item.active{color:var(--gold);background:rgba(200,146,42,0.08);border-left-color:var(--gold);}
+.sb-icon{font-size:16px;width:20px;text-align:center;}
+.sb-badge{
+  margin-left:auto;background:var(--gold);color:#0D0D0D;
+  font-size:10px;font-weight:700;border-radius:10px;
+  padding:2px 7px;min-width:20px;text-align:center;
+}
+.sb-footer{
+  padding:16px 20px;border-top:1px solid var(--border);
+  font-size:12px;color:var(--muted);
+}
+.sb-logout{
+  display:flex;align-items:center;gap:8px;cursor:pointer;
+  transition:color 0.15s;margin-top:8px;
+}
+.sb-logout:hover{color:var(--danger);}
+
+/* ===== MAIN ===== */
+main{flex:1;overflow-y:auto;background:var(--bg);}
+.page{display:none;padding:32px 36px;max-width:1200px;}
+.page.active{display:block;}
+
+/* ===== TOP BAR ===== */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:32px;
+}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--text);}
+.page-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+.tb-right{display:flex;gap:10px;align-items:center;}
+
+/* ===== BUTTONS ===== */
+.btn{
+  background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  padding:10px 18px;border-radius:8px;font-family:'Poppins',sans-serif;
+  font-size:13px;font-weight:500;cursor:pointer;
+  transition:all 0.15s;letter-spacing:0.5px;
+  display:inline-flex;align-items:center;gap:7px;
+}
+.btn:hover{background:var(--bg4);border-color:rgba(255,255,255,0.15);}
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold),var(--gold-l));
+  color:#0D0D0D;border:none;font-weight:700;
+}
+.btn-gold:hover{opacity:0.9;transform:scale(1.02);}
+.btn-green{background:rgba(46,187,90,0.15);border-color:rgba(46,187,90,0.3);color:var(--green-l);}
+.btn-green:hover{background:rgba(46,187,90,0.25);}
+.btn-danger{background:rgba(232,64,64,0.1);border-color:rgba(232,64,64,0.3);color:var(--danger);}
+.btn-danger:hover{background:rgba(232,64,64,0.2);}
+.btn-sm{padding:7px 13px;font-size:12px;}
+
+/* ===== STATS CARDS ===== */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:20px 22px;
+  position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--accent,var(--gold));
+}
+.stat-label{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;color:var(--text);}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:6px;}
+.stat-icon{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:32px;opacity:0.15;}
+
+/* ===== PANELS ===== */
+.panel{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:24px;overflow:hidden;
+}
+.panel-head{
+  padding:18px 24px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-title{font-size:15px;font-weight:600;}
+.panel-body{padding:24px;}
+
+/* ===== TABLE ===== */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{
+  font-size:11px;letter-spacing:1px;text-transform:uppercase;
+  color:var(--muted);padding:10px 14px;
+  border-bottom:1px solid var(--border);text-align:left;font-weight:500;
+}
+.data-table td{
+  padding:14px;border-bottom:1px solid rgba(255,255,255,0.04);
+  font-size:14px;vertical-align:middle;
+}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(255,255,255,0.02);}
+
+/* ===== BADGES ===== */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;letter-spacing:0.5px;}
+.badge-gold{background:rgba(200,146,42,0.15);color:var(--gold-l);}
+.badge-green{background:rgba(46,187,90,0.15);color:var(--green-l);}
+.badge-pink{background:rgba(232,56,109,0.15);color:var(--pink);}
+.badge-muted{background:rgba(255,255,255,0.06);color:var(--muted);}
+.badge-live{background:rgba(232,56,109,0.2);color:var(--pink);animation:pulse-badge 1.5s infinite;}
+@keyframes pulse-badge{0%,100%{opacity:1;}50%{opacity:0.6;}}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--pink);}
+
+/* ===== FORMS ===== */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.form-row.full{grid-template-columns:1fr;}
+.form-row.three{grid-template-columns:1fr 1fr 1fr;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-label{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:500;}
+.form-input,.form-select,.form-textarea{
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--text);padding:12px 14px;border-radius:8px;
+  font-family:'Poppins',sans-serif;font-size:14px;outline:none;
+  transition:border-color 0.2s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold);}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-select{cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23C8922A' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+}
+.form-select option{background:#1a1a1a;}
+
+/* ===== AVATAR UPLOAD ===== */
+.avatar-upload{
+  width:100px;height:100px;border-radius:50%;
+  border:2px dashed var(--border-gold);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:28px;transition:all 0.2s;
+  background:var(--bg3);overflow:hidden;position:relative;flex-shrink:0;
+}
+.avatar-upload:hover{border-color:var(--gold);background:rgba(200,146,42,0.05);}
+.avatar-upload img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.avatar-upload input{display:none;}
+
+/* ===== MODAL ===== */
+.modal-overlay{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--bg2);border:1px solid var(--border-gold);
+  border-radius:16px;width:100%;max-width:560px;
+  max-height:90vh;overflow-y:auto;
+  animation:modal-in 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes modal-in{from{opacity:0;transform:scale(0.9) translateY(20px);}to{opacity:1;transform:none;}}
+.modal-head{
+  padding:22px 28px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;background:var(--bg2);z-index:2;
+}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--gold);}
+.modal-close-btn{
+  background:rgba(255,255,255,0.07);border:none;
+  color:var(--text);width:34px;height:34px;border-radius:50%;
+  cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;
+  transition:background 0.15s;
+}
+.modal-close-btn:hover{background:rgba(255,255,255,0.15);}
+.modal-body{padding:28px;}
+.modal-footer{
+  padding:18px 28px;border-top:1px solid var(--border);
+  display:flex;gap:10px;justify-content:flex-end;
+}
+
+/* ===== PROGRAMME EDITOR ===== */
+.prog-row{
+  display:grid;grid-template-columns:100px 1fr 160px 120px 60px;gap:12px;
+  align-items:center;padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.prog-row:last-child{border-bottom:none;}
+.prog-row-head{
+  display:grid;grid-template-columns:100px 1fr 160px 120px 60px;gap:12px;
+  padding:8px 0;border-bottom:1px solid var(--border);margin-bottom:4px;
+}
+.prog-time-inp{
+  background:var(--bg3);border:1px solid var(--border);color:var(--text);
+  padding:8px 10px;border-radius:6px;font-family:'Poppins',sans-serif;font-size:13px;
+  outline:none;width:100%;transition:border-color 0.2s;
+}
+.prog-time-inp:focus{border-color:var(--gold);}
+
+/* ===== CERT PREVIEW ===== */
+#cert-canvas{border:1px solid var(--border-gold);border-radius:8px;max-width:100%;display:block;margin:0 auto;}
+.cert-controls{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+
+/* ===== ATTENDEE CARDS ===== */
+.attendee-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.att-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:12px;padding:18px;
+  display:flex;align-items:center;gap:14px;
+  transition:border-color 0.2s;
+}
+.att-card:hover{border-color:var(--border-gold);}
+.att-avatar{
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(200,146,42,0.3),rgba(46,187,90,0.2));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);flex-shrink:0;
+}
+.att-name{font-weight:600;font-size:15px;}
+.att-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.att-id{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--gold);margin-left:auto;letter-spacing:1px;}
+
+/* ===== LIVE STATUS ===== */
+.live-bar{
+  background:linear-gradient(135deg,rgba(232,56,109,0.12),rgba(255,107,53,0.08));
+  border:1px solid rgba(232,56,109,0.25);
+  border-radius:12px;padding:18px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;
+}
+.live-bar-left{display:flex;align-items:center;gap:12px;}
+.live-indicator{
+  width:12px;height:12px;border-radius:50%;background:var(--pink);
+  animation:pulse-live 1.2s ease-in-out infinite;
+  box-shadow:0 0 0 0 rgba(232,56,109,0.4);
+}
+@keyframes pulse-live{
+  0%{box-shadow:0 0 0 0 rgba(232,56,109,0.5);}
+  70%{box-shadow:0 0 0 10px rgba(232,56,109,0);}
+  100%{box-shadow:0 0 0 0 rgba(232,56,109,0);}
+}
+.live-label{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--pink);}
+.live-session{font-size:17px;font-weight:600;}
+
+/* ===== TOAST ===== */
+#toast{
+  position:fixed;bottom:24px;right:24px;z-index:9000;
+  background:var(--bg3);border:1px solid var(--border-gold);
+  border-radius:10px;padding:14px 20px;
+  font-size:14px;display:flex;align-items:center;gap:10px;
+  transform:translateY(80px);opacity:0;
+  transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events:none;
+}
+#toast.show{transform:translateY(0);opacity:1;}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  aside{width:60px;}
+  .sb-item span,.sb-brand-name,.sb-brand-sub,.sb-section,.sb-badge,.sb-footer{display:none;}
+  .sb-item{justify-content:center;padding:14px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .prog-row,.prog-row-head{grid-template-columns:80px 1fr 1fr;} 
+  .prog-row > *:nth-child(4),.prog-row > *:nth-child(5),.prog-row-head > *:nth-child(4),.prog-row-head > *:nth-child(5){display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🔐</div>
+    <div class="login-title">PIN Admin</div>
+    <div class="login-sub">Sip, Paint &amp; Poetry 1.0 · Event Dashboard</div>
+    <input type="text" class="login-input" id="login-user" placeholder="Username" />
+    <input type="password" class="login-input" id="login-pass" placeholder="Password" />
+    <button class="login-btn" onclick="doLogin()">Enter Dashboard</button>
+    <div class="login-err" id="login-err">❌ Invalid credentials. Try: admin / pin2026</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:16px;">Default: admin / pin2026</div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app" style="display:none;">
+
+<!-- SIDEBAR -->
+<aside>
+  <div class="sb-brand">
+    <div style="font-size:22px;margin-bottom:4px;">🎤</div>
+    <div class="sb-brand-name">PIN Admin</div>
+    <div class="sb-brand-sub">Event Control Panel</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Overview</div>
+    <div class="sb-item active" onclick="showPage('dashboard')">
+      <span class="sb-icon">📊</span><span>Dashboard</span>
+    </div>
+    <div class="sb-section">Manage</div>
+    <div class="sb-item" onclick="showPage('presenters')">
+      <span class="sb-icon">🎤</span><span>Presenters</span>
+      <span class="sb-badge" id="sb-presenter-count">0</span>
+    </div>
+    <div class="sb-item" onclick="showPage('programme')">
+      <span class="sb-icon">📋</span><span>Programme</span>
+    </div>
+    <div class="sb-item" onclick="showPage('attendees')">
+      <span class="sb-icon">👥</span><span>Attendees</span>
+      <span class="sb-badge" id="sb-att-count">0</span>
+    </div>
+    <div class="sb-item" onclick="showPage('checkin')">
+      <span class="sb-icon">✅</span><span>Check In</span>
+    </div>
+    <div class="sb-section">Tools</div>
+    <div class="sb-item" onclick="showPage('certificates')">
+      <span class="sb-icon">🏆</span><span>Certificates</span>
+    </div>
+    <div class="sb-item" onclick="showPage('live')">
+      <span class="sb-icon">🔴</span><span>Live Stage</span>
+    </div>
+  </nav>
+  <div class="sb-footer">
+    <div style="font-size:11px;margin-bottom:4px;">Nexa Digital Solutions</div>
+    <div class="sb-logout" onclick="doLogout()">🚪 <span>Logout</span></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main>
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="topbar">
+    <div><div class="page-title">Dashboard</div><div class="page-sub">Sip, Paint &amp; Poetry 1.0 · June 13, 2026</div></div>
+    <div class="tb-right">
+      <span style="font-size:13px;color:var(--muted);" id="live-time">--:--</span>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card" style="--accent:var(--gold)">
+      <div class="stat-label">Registered</div>
+      <div class="stat-num" id="stat-reg">0</div>
+      <div class="stat-sub">Total attendees</div>
+      <div class="stat-icon">👥</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--green-l)">
+      <div class="stat-label">Checked In</div>
+      <div class="stat-num" id="stat-checked">0</div>
+      <div class="stat-sub">At venue today</div>
+      <div class="stat-icon">✅</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--pink)">
+      <div class="stat-label">Presenters</div>
+      <div class="stat-num" id="stat-pres">0</div>
+      <div class="stat-sub">Added to lineup</div>
+      <div class="stat-icon">🎤</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--cyan)">
+      <div class="stat-label">Certificates</div>
+      <div class="stat-num" id="stat-certs">0</div>
+      <div class="stat-sub">Generated today</div>
+      <div class="stat-icon">🏆</div>
+    </div>
+  </div>
+
+  <div class="live-bar" id="dash-live-bar">
+    <div class="live-bar-left">
+      <div class="live-indicator"></div>
+      <div>
+        <div class="live-label">Now On Stage</div>
+        <div class="live-session" id="dash-live-session">Loading...</div>
+      </div>
+    </div>
+    <button class="btn" onclick="showPage('live')">Manage Stage →</button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Recent Check-ins</span><button class="btn btn-sm" onclick="showPage('attendees')">View All</button></div>
+      <div class="panel-body" id="recent-checkins"><div style="color:var(--muted);font-size:14px;text-align:center;padding:20px;">No check-ins yet</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Quick Actions</span></div>
+      <div class="panel-body" style="display:flex;flex-direction:column;gap:10px;">
+        <button class="btn btn-gold" onclick="showPage('checkin')">✅ Check In Attendee</button>
+        <button class="btn btn-green" onclick="showPage('certificates')">🏆 Generate Certificate</button>
+        <button class="btn" onclick="showPage('presenters')">➕ Add Presenter</button>
+        <button class="btn" onclick="showPage('programme')">⏰ Update Timing</button>
+        <button class="btn" onclick="showPage('live')">🔴 Update Live Stage</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRESENTERS -->
+<div class="page" id="page-presenters">
+  <div class="topbar">
+    <div><div class="page-title">Presenters</div><div class="page-sub">Manage your event lineup</div></div>
+    <button class="btn btn-gold" onclick="openPresenterModal()">+ Add Presenter</button>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">Presenter Lineup</span>
+      <span style="font-size:13px;color:var(--muted);" id="pres-count-label">0 presenters</span>
+    </div>
+    <div class="panel-body" style="padding:0;">
+      <table class="data-table" id="presenters-table">
+        <thead>
+          <tr>
+            <th style="width:60px">Photo</th>
+            <th>Name</th>
+            <th>Role / Type</th>
+            <th>Bio</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="presenters-tbody">
+          <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px;">No presenters added yet. Click "Add Presenter" to get started.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRAMME EDITOR -->
+<div class="page" id="page-programme">
+  <div class="topbar">
+    <div><div class="page-title">Programme Editor</div><div class="page-sub">Edit timing, titles, and presenters for each session</div></div>
+    <button class="btn btn-gold" onclick="addProgItem()">+ Add Session</button>
+  </div>
+  <div class="panel">
+    <div class="panel-head">
+      <span class="panel-title">Event Schedule — June 13, 2026</span>
+      <button class="btn btn-green btn-sm" onclick="savePrograme()">💾 Save Changes</button>
+    </div>
+    <div class="panel-body">
+      <div class="prog-row-head">
+        <span style="font-size:11px;color:var(--muted);letter-spacing:1px;">TIME</span>
+        <span style="font-size:11px;color:var(--muted);letter-spacing:1px;">SESSION TITLE</span>
+        <span style="font-size:11px;color:var(--muted);letter-spacing:1px;">PRESENTER / NOTE</span>
+        <span style="font-size:11px;color:var(--muted);letter-spacing:1px;">TAG</span>
+        <span></span>
+      </div>
+      <div id="prog-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ATTENDEES -->
+<div class="page" id="page-attendees">
+  <div class="topbar">
+    <div><div class="page-title">Attendees</div><div class="page-sub">All registered participants</div></div>
+    <div class="tb-right">
+      <input type="text" class="form-input" style="width:220px;padding:9px 14px;" placeholder="🔍 Search by name..." oninput="filterAttendees(this.value)" />
+      <button class="btn btn-green" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+  </div>
+  <div class="attendee-grid" id="attendee-grid">
+    <div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px;">No attendees registered yet.</div>
+  </div>
+</div>
+
+<!-- CHECK-IN -->
+<div class="page" id="page-checkin">
+  <div class="topbar">
+    <div><div class="page-title">Check In</div><div class="page-sub">Register walk-in attendees at the gate</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">New Attendee</span></div>
+      <div class="panel-body">
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Full Name *</label>
+          <input type="text" class="form-input" id="ci-name" placeholder="Enter full name" />
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-input" id="ci-phone" placeholder="08012345678" />
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Occupation / School</label>
+          <input type="text" class="form-input" id="ci-occ" placeholder="Student, Teacher, Artist..." />
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">City / Origin</label>
+          <input type="text" class="form-input" id="ci-city" placeholder="Gombe, Jalingo, Abuja..." />
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <button class="btn btn-gold" style="flex:1;" onclick="checkInAttendee()">✅ Check In &amp; Register</button>
+          <button class="btn btn-green" onclick="checkInAndCert()">🏆 Check In + Certificate</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Last Checked In</span></div>
+      <div class="panel-body" id="last-checkin-display">
+        <div style="text-align:center;color:var(--muted);padding:30px 0;">Waiting for first check-in...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CERTIFICATES -->
+<div class="page" id="page-certificates">
+  <div class="topbar">
+    <div><div class="page-title">Certificates</div><div class="page-sub">Generate &amp; download attendance certificates</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:24px;">
+    <div>
+      <div class="panel" style="margin-bottom:0;">
+        <div class="panel-head"><span class="panel-title">Generate Certificate</span></div>
+        <div class="panel-body">
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label">Attendee Name</label>
+            <input type="text" class="form-input" id="cert-name" placeholder="Enter full name" oninput="previewCert()" />
+          </div>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label">Or pick from attendees</label>
+            <select class="form-select" id="cert-pick" onchange="pickCertAttendee()">
+              <option value="">— Select an attendee —</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label">Certificate Type</label>
+            <select class="form-select" id="cert-type" onchange="previewCert()">
+              <option value="attendance">Certificate of Attendance</option>
+              <option value="participation">Certificate of Participation</option>
+              <option value="performance">Certificate of Performance</option>
+              <option value="excellence">Certificate of Excellence</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:20px;">
+            <label class="form-label">Role / Category (optional)</label>
+            <input type="text" class="form-input" id="cert-role" placeholder="e.g. Featured Poet, Visual Artist..." oninput="previewCert()" />
+          </div>
+          <button class="btn btn-gold" style="width:100%;justify-content:center;padding:14px;" onclick="downloadCert()">⬇ Download PDF Certificate</button>
+          <button class="btn btn-green" style="width:100%;justify-content:center;margin-top:10px;" onclick="bulkGenCerts()">📦 Generate All Attendees</button>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Certificate Preview</span></div>
+      <div class="panel-body" style="background:var(--bg3);border-radius:8px;padding:16px;">
+        <canvas id="cert-canvas" width="800" height="566"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE STAGE -->
+<div class="page" id="page-live">
+  <div class="topbar">
+    <div><div class="page-title">Live Stage</div><div class="page-sub">Control what attendees see as "Now On Stage"</div></div>
+  </div>
+  <div class="live-bar">
+    <div class="live-bar-left">
+      <div class="live-indicator"></div>
+      <div>
+        <div class="live-label">Currently Broadcasting</div>
+        <div class="live-session" id="live-now-display">Not Set</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Set Active Session</span></div>
+      <div class="panel-body">
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label">Session Title</label>
+          <input type="text" class="form-input" id="live-title" placeholder="e.g. First Poetry Session" />
+        </div>
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label">Presenter / Description</label>
+          <input type="text" class="form-input" id="live-pres" placeholder="e.g. Featuring Amina Garba" />
+        </div>
+        <div class="form-group" style="margin-bottom:20px;">
+          <label class="form-label">Or pick from programme</label>
+          <select class="form-select" id="live-prog-pick" onchange="pickLiveProg()">
+            <option value="">— Select from programme —</option>
+          </select>
+        </div>
+        <button class="btn btn-gold" style="width:100%;justify-content:center;" onclick="setLiveSession()">🔴 Go Live</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Programme Quick-Set</span></div>
+      <div class="panel-body" id="live-prog-buttons" style="display:flex;flex-direction:column;gap:8px;">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div><!-- /app -->
+
+<!-- PRESENTER MODAL -->
+<div class="modal-overlay" id="pres-modal">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <div class="modal-title" id="pres-modal-title">Add Presenter</div>
+      <button class="modal-close-btn" onclick="closePresModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;">
+        <div class="avatar-upload" id="pres-avatar-preview" onclick="document.getElementById('pres-photo-inp').click()">
+          <span id="pres-avatar-emoji">📷</span>
+          <input type="file" id="pres-photo-inp" accept="image/*" onchange="loadPresPhoto(this)" />
+        </div>
+        <div style="flex:1;">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Full Name *</label>
+              <input type="text" class="form-input" id="pres-name" placeholder="Presenter's full name" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role / Type *</label>
+              <select class="form-select" id="pres-role">
+                <option value="Featured Poet">Featured Poet</option>
+                <option value="Visual Artist">Visual Artist</option>
+                <option value="Spoken Word Artist">Spoken Word Artist</option>
+                <option value="Live Musician">Live Musician</option>
+                <option value="Host / MC">Host / MC</option>
+                <option value="Guest Speaker">Guest Speaker</option>
+                <option value="Guest Poet">Guest Poet</option>
+                <option value="Painter">Painter</option>
+                <option value="Performer">Performer</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group">
+          <label class="form-label">Short Bio</label>
+          <textarea class="form-textarea" id="pres-bio" placeholder="A brief description of this presenter (2-3 sentences)..."></textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Session / Programme Slot</label>
+          <input type="text" class="form-input" id="pres-slot" placeholder="e.g. 10:00 AM Poetry Session" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="pres-status">
+            <option value="confirmed">Confirmed</option>
+            <option value="live">Live Now</option>
+            <option value="done">Performed</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group">
+          <label class="form-label">Social / Contact (optional)</label>
+          <input type="text" class="form-input" id="pres-social" placeholder="@handle or phone number" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closePresModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="savePresenter()">💾 Save Presenter</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+  <span id="toast-icon">✅</span>
+  <span id="toast-msg">Saved!</span>
+</div>
+
+<script>
+// ===== STATE =====
+let state = {
+  presenters: [],
+  attendees: [],
+  programme: [
+    {id:1, time:'9:00 AM',  title:'Gates Open & Registration',     note:'Welcome reception · Digital check-in', tag:'Opening', live:false},
+    {id:2, time:'9:30 AM',  title:'Official Opening Ceremony',     note:'PIN President · Teemerh Arts Foundation', tag:'Ceremony', live:false},
+    {id:3, time:'10:00 AM', title:'First Poetry Session',          note:'Featured poets · Open mic · Spoken word', tag:'Poetry', live:false},
+    {id:4, time:'11:30 AM', title:'Live Painting Exhibition',      note:'Artists & audience participation', tag:'Painting', live:false},
+    {id:5, time:'1:00 PM',  title:'Sip & Mingle Break',            note:'Refreshments · Networking', tag:'Break', live:false},
+    {id:6, time:'2:00 PM',  title:'Live Music Session',            note:'Acoustic performances', tag:'Music', live:false},
+    {id:7, time:'3:00 PM',  title:'Second Poetry Session',         note:'Community voices · Closing spoken word', tag:'Poetry', live:false},
+    {id:8, time:'4:30 PM',  title:'Certificates & Closing',        note:'Recognition · Group photo', tag:'Closing', live:false},
+  ],
+  liveSession: {title:'Gates Open & Registration', presenter:'Welcome reception · Digital check-in'},
+  certCount: 0,
+  editingPresId: null,
+  presPhotoData: null,
+};
+
+function save(){localStorage.setItem('pin_admin',JSON.stringify(state));}
+function load(){
+  const d = localStorage.getItem('pin_admin');
+  if(d) state = JSON.parse(d);
+}
+load();
+
+// ===== LOGIN =====
+function doLogin(){
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value.trim();
+  if(u==='admin' && p==='pin2026'){
+    document.getElementById('login-screen').classList.add('hide');
+    document.getElementById('app').style.display='flex';
+    init();
+  } else {
+    document.getElementById('login-err').style.display='block';
+  }
+}
+document.getElementById('login-user').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+function doLogout(){
+  document.getElementById('login-screen').classList.remove('hide');
+  document.getElementById('app').style.display='none';
+}
+
+// ===== INIT =====
+function init(){
+  updateStats();
+  renderPresenters();
+  renderProgramme();
+  renderAttendees();
+  renderLiveButtons();
+  updateLiveDisplay();
+  previewCert();
+  populateCertPick();
+  populateLivePick();
+  setInterval(()=>{
+    const n=new Date();
+    const t=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0')+':'+n.getSeconds().toString().padStart(2,'0');
+    const el=document.getElementById('live-time');
+    if(el)el.textContent=t;
+  },1000);
+}
+
+// ===== PAGE NAV =====
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelector(`.sb-item[onclick="showPage('${id}')"]`)?.classList.add('active');
+  if(id==='certificates'){previewCert();populateCertPick();}
+  if(id==='live'){renderLiveButtons();populateLivePick();}
+  if(id==='dashboard'){renderRecentCheckins();}
+}
+
+// ===== STATS =====
+function updateStats(){
+  document.getElementById('stat-reg').textContent = state.attendees.length;
+  document.getElementById('stat-checked').textContent = state.attendees.filter(a=>a.checkedIn).length;
+  document.getElementById('stat-pres').textContent = state.presenters.length;
+  document.getElementById('stat-certs').textContent = state.certCount;
+  document.getElementById('sb-presenter-count').textContent = state.presenters.length;
+  document.getElementById('sb-att-count').textContent = state.attendees.length;
+  document.getElementById('dash-live-session').textContent = state.liveSession.title;
+}
+
+// ===== PRESENTERS =====
+function openPresenterModal(id=null){
+  state.editingPresId = id;
+  state.presPhotoData = null;
+  if(id !== null){
+    const p = state.presenters.find(x=>x.id===id);
+    document.getElementById('pres-modal-title').textContent = 'Edit Presenter';
+    document.getElementById('pres-name').value = p.name;
+    document.getElementById('pres-role').value = p.role;
+    document.getElementById('pres-bio').value = p.bio || '';
+    document.getElementById('pres-slot').value = p.slot || '';
+    document.getElementById('pres-status').value = p.status || 'confirmed';
+    document.getElementById('pres-social').value = p.social || '';
+    if(p.photo){
+      state.presPhotoData = p.photo;
+      const preview = document.getElementById('pres-avatar-preview');
+      preview.innerHTML = `<img src="${p.photo}" /><input type="file" id="pres-photo-inp" accept="image/*" onchange="loadPresPhoto(this)" />`;
+    } else {
+      resetPresAvatar();
+    }
+  } else {
+    document.getElementById('pres-modal-title').textContent = 'Add Presenter';
+    document.getElementById('pres-name').value='';
+    document.getElementById('pres-bio').value='';
+    document.getElementById('pres-slot').value='';
+    document.getElementById('pres-social').value='';
+    document.getElementById('pres-role').value='Featured Poet';
+    document.getElementById('pres-status').value='confirmed';
+    resetPresAvatar();
+  }
+  document.getElementById('pres-modal').classList.add('open');
+}
+function resetPresAvatar(){
+  document.getElementById('pres-avatar-preview').innerHTML = `<span id="pres-avatar-emoji">📷</span><input type="file" id="pres-photo-inp" accept="image/*" onchange="loadPresPhoto(this)" />`;
+}
+function closePresModal(){ document.getElementById('pres-modal').classList.remove('open'); }
+function loadPresPhoto(inp){
+  const file = inp.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.presPhotoData = e.target.result;
+    const preview = document.getElementById('pres-avatar-preview');
+    preview.innerHTML = `<img src="${e.target.result}" /><input type="file" id="pres-photo-inp" accept="image/*" onchange="loadPresPhoto(this)" />`;
+  };
+  reader.readAsDataURL(file);
+}
+function savePresenter(){
+  const name = document.getElementById('pres-name').value.trim();
+  if(!name){ showToast('❌','Please enter a name','error'); return; }
+  const data = {
+    name, role: document.getElementById('pres-role').value,
+    bio: document.getElementById('pres-bio').value,
+    slot: document.getElementById('pres-slot').value,
+    status: document.getElementById('pres-status').value,
+    social: document.getElementById('pres-social').value,
+    photo: state.presPhotoData,
+  };
+  if(state.editingPresId !== null){
+    const idx = state.presenters.findIndex(x=>x.id===state.editingPresId);
+    state.presenters[idx] = {...state.presenters[idx],...data};
+  } else {
+    data.id = Date.now();
+    state.presenters.push(data);
+  }
+  save(); renderPresenters(); updateStats(); closePresModal();
+  showToast('✅','Presenter saved!');
+}
+function deletePresenter(id){
+  if(!confirm('Remove this presenter?')) return;
+  state.presenters = state.presenters.filter(p=>p.id!==id);
+  save(); renderPresenters(); updateStats();
+  showToast('🗑️','Presenter removed');
+}
+function renderPresenters(){
+  const tbody = document.getElementById('presenters-tbody');
+  document.getElementById('pres-count-label').textContent = state.presenters.length+' presenters';
+  if(!state.presenters.length){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px;">No presenters added yet.</td></tr>';
+    return;
+  }
+  const tagColors = {confirmed:'badge-green',live:'badge-live',done:'badge-muted',pending:'badge-gold'};
+  tbody.innerHTML = state.presenters.map(p=>`
+  <tr>
+    <td>
+      <div style="width:44px;height:44px;border-radius:50%;overflow:hidden;background:rgba(200,146,42,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;">
+        ${p.photo ? `<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover;">` : '🎤'}
+      </div>
+    </td>
+    <td><strong>${p.name}</strong>${p.social?`<br><span style="font-size:11px;color:var(--muted)">${p.social}</span>`:''}
+    </td>
+    <td><span class="badge badge-gold">${p.role}</span></td>
+    <td style="font-size:12px;color:var(--muted);max-width:200px;">${(p.bio||'').slice(0,80)}${(p.bio||'').length>80?'…':''}</td>
+    <td><span class="badge ${tagColors[p.status]||'badge-muted'}">${p.status==='live'?'<div class="live-dot"></div>':''} ${p.status}</span></td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-sm" onclick="openPresenterModal(${p.id})">✏️ Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="deletePresenter(${p.id})" style="margin-left:6px;">🗑️</button>
+    </td>
+  </tr>`).join('');
+}
+
+// ===== PROGRAMME =====
+function renderProgramme(){
+  const list = document.getElementById('prog-list');
+  list.innerHTML = state.programme.map((s,i)=>`
+  <div class="prog-row" id="prow-${s.id}">
+    <input class="prog-time-inp" value="${s.time}" onchange="updateProg(${s.id},'time',this.value)" />
+    <input class="prog-time-inp" value="${s.title}" onchange="updateProg(${s.id},'title',this.value)" />
+    <input class="prog-time-inp" value="${s.note}" onchange="updateProg(${s.id},'note',this.value)" />
+    <input class="prog-time-inp" value="${s.tag}" onchange="updateProg(${s.id},'tag',this.value)" style="text-transform:uppercase;font-size:11px;" />
+    <button class="btn btn-danger btn-sm" onclick="deleteProgItem(${s.id})">🗑️</button>
+  </div>`).join('');
+}
+function updateProg(id,field,val){
+  const s = state.programme.find(x=>x.id===id);
+  if(s) s[field]=val;
+}
+function addProgItem(){
+  state.programme.push({id:Date.now(), time:'TBD', title:'New Session', note:'', tag:'Session', live:false});
+  renderProgramme(); showToast('✅','Session added');
+}
+function deleteProgItem(id){
+  state.programme = state.programme.filter(s=>s.id!==id);
+  renderProgramme();
+}
+function savePrograme(){
+  save(); renderLiveButtons(); populateLivePick();
+  showToast('💾','Programme saved!');
+}
+
+// ===== ATTENDEES =====
+function renderAttendees(filter=''){
+  const grid = document.getElementById('attendee-grid');
+  const list = filter ? state.attendees.filter(a=>a.name.toLowerCase().includes(filter.toLowerCase())) : state.attendees;
+  if(!list.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:40px;">No attendees found.</div>';
+    return;
+  }
+  grid.innerHTML = list.map(a=>`
+  <div class="att-card">
+    <div class="att-avatar">${a.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
+    <div>
+      <div class="att-name">${a.name}</div>
+      <div class="att-meta">${a.phone||'No phone'} · ${a.city||'–'}</div>
+      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+        ${a.checkedIn ? '<span class="badge badge-green">✅ Checked In</span>' : '<span class="badge badge-muted">Registered</span>'}
+        ${a.certIssued ? '<span class="badge badge-gold">🏆 Cert Issued</span>' : ''}
+      </div>
+    </div>
+    <div>
+      <div class="att-id">${a.id}</div>
+      <button class="btn btn-sm btn-green" onclick="certForAttendee('${a.name}')" style="margin-top:8px;font-size:11px;">🏆</button>
+    </div>
+  </div>`).join('');
+}
+function filterAttendees(v){ renderAttendees(v); }
+function renderRecentCheckins(){
+  const el = document.getElementById('recent-checkins');
+  const recent = state.attendees.filter(a=>a.checkedIn).slice(-5).reverse();
+  if(!recent.length){ el.innerHTML='<div style="color:var(--muted);font-size:14px;text-align:center;padding:10px;">No check-ins yet</div>'; return; }
+  el.innerHTML = recent.map(a=>`
+  <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+    <div class="att-avatar" style="width:36px;height:36px;font-size:14px;">${a.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}</div>
+    <div style="flex:1;"><div style="font-size:14px;font-weight:500">${a.name}</div><div style="font-size:11px;color:var(--muted)">${a.city||''} · ${a.id}</div></div>
+  </div>`).join('');
+}
+
+// ===== CHECK-IN =====
+function checkInAttendee(){
+  const name = document.getElementById('ci-name').value.trim();
+  if(!name){ showToast('❌','Please enter a name','error'); return; }
+  const id = 'PIN-' + String(state.attendees.length+1).padStart(4,'0');
+  const att = {
+    id, name,
+    phone: document.getElementById('ci-phone').value.trim(),
+    occ: document.getElementById('ci-occ').value.trim(),
+    city: document.getElementById('ci-city').value.trim(),
+    checkedIn: true, certIssued: false,
+    time: new Date().toLocaleTimeString()
+  };
+  state.attendees.push(att);
+  save(); updateStats(); renderAttendees(); populateCertPick();
+  document.getElementById('ci-name').value='';
+  document.getElementById('ci-phone').value='';
+  document.getElementById('ci-occ').value='';
+  document.getElementById('ci-city').value='';
+  showLastCheckin(att);
+  showToast('✅', `${name} checked in! (${id})`);
+}
+function checkInAndCert(){
+  checkInAttendee();
+  const att = state.attendees[state.attendees.length-1];
+  if(att){ setTimeout(()=>{ showPage('certificates'); document.getElementById('cert-name').value=att.name; previewCert(); },300); }
+}
+function showLastCheckin(att){
+  const el = document.getElementById('last-checkin-display');
+  const initials = att.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  el.innerHTML = `
+  <div style="text-align:center;padding:10px 0;">
+    <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,rgba(200,146,42,0.3),rgba(46,187,90,0.2));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gold);margin:0 auto 12px;">${initials}</div>
+    <div style="font-size:20px;font-weight:700;">${att.name}</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);letter-spacing:3px;margin:8px 0;">${att.id}</div>
+    <div style="font-size:12px;color:var(--muted);">${att.time} · ${att.city||'–'}</div>
+    <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;">
+      <span class="badge badge-green">✅ Checked In</span>
+    </div>
+    <button class="btn btn-gold" style="margin-top:16px;width:100%;justify-content:center;" onclick="certForAttendee('${att.name}')">🏆 Generate Certificate</button>
+  </div>`;
+}
+function certForAttendee(name){
+  showPage('certificates');
+  document.getElementById('cert-name').value = name;
+  previewCert();
+}
+
+// ===== CERTIFICATES =====
+function populateCertPick(){
+  const sel = document.getElementById('cert-pick');
+  sel.innerHTML = '<option value="">— Select an attendee —</option>' +
+    state.attendees.map(a=>`<option value="${a.name}">${a.name} (${a.id})</option>`).join('');
+}
+function pickCertAttendee(){
+  const v = document.getElementById('cert-pick').value;
+  if(v){ document.getElementById('cert-name').value=v; previewCert(); }
+}
+
+function previewCert(){
+  const canvas = document.getElementById('cert-canvas');
+  const ctx = canvas.getContext('2d');
+  const W=800, H=566;
+  ctx.clearRect(0,0,W,H);
+
+  // Background gradient – deep dark gold
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#0A0800');
+  bg.addColorStop(0.5,'#100E02');
+  bg.addColorStop(1,'#080A06');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  // Decorative border outer
+  ctx.strokeStyle='#C8922A'; ctx.lineWidth=4;
+  ctx.strokeRect(16,16,W-32,H-32);
+  // Inner border
+  ctx.strokeStyle='rgba(200,146,42,0.35)'; ctx.lineWidth=1;
+  ctx.strokeRect(28,28,W-56,H-56);
+
+  // Corner ornaments
+  function corner(x,y,sx,sy){
+    ctx.strokeStyle='#C8922A'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(x,y+sy*30); ctx.lineTo(x,y); ctx.lineTo(x+sx*30,y); ctx.stroke();
+    ctx.strokeStyle='rgba(245,200,66,0.5)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x,y+sy*15); ctx.lineTo(x,y+sy*5); ctx.lineTo(x+sx*5,y); ctx.lineTo(x+sx*15,y); ctx.stroke();
+  }
+  corner(16,16,1,1); corner(W-16,16,-1,1); corner(16,H-16,1,-1); corner(W-16,H-16,-1,-1);
+
+  // PIN logo area top
+  ctx.fillStyle='rgba(200,146,42,0.08)';
+  ctx.beginPath(); ctx.arc(W/2,72,42,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(200,146,42,0.5)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(W/2,72,42,0,Math.PI*2); ctx.stroke();
+  ctx.font='bold 28px Georgia,serif'; ctx.fillStyle='#C8922A'; ctx.textAlign='center';
+  ctx.fillText('PIN',W/2,82);
+
+  // Gold divider line
+  const grd = ctx.createLinearGradient(80,0,W-80,0);
+  grd.addColorStop(0,'transparent'); grd.addColorStop(0.2,'#C8922A'); grd.addColorStop(0.8,'#C8922A'); grd.addColorStop(1,'transparent');
+  ctx.strokeStyle=grd; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(80,118); ctx.lineTo(W-80,118); ctx.stroke();
+
+  // Org names
+  ctx.font='500 11px Poppins,sans-serif'; ctx.fillStyle='rgba(200,146,42,0.6)';
+  ctx.fillText('POETS IN NIGERIA (PIN) × TEEMERH ARTS FOUNDATION', W/2, 136);
+
+  // PRESENTS
+  ctx.font='300 10px Poppins,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.3)';
+  ctx.fillText('P R E S E N T S', W/2, 152);
+
+  // Event name
+  ctx.font='bold 22px Poppins,sans-serif';
+  const evGrd = ctx.createLinearGradient(0,160,0,195);
+  evGrd.addColorStop(0,'#F5C842'); evGrd.addColorStop(1,'#C8922A');
+  ctx.fillStyle=evGrd;
+  ctx.fillText('SIP, PAINT & POETRY 1.0', W/2, 178);
+
+  // cert type heading
+  const certType = document.getElementById('cert-type')?.value || 'attendance';
+  const typeLabel = {attendance:'Certificate of Attendance', participation:'Certificate of Participation', performance:'Certificate of Performance', excellence:'Certificate of Excellence'}[certType];
+  ctx.font='300 13px Poppins,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.5)';
+  ctx.fillText(typeLabel.toUpperCase().replace('CERTIFICATE OF ','CERTIFICATE OF '), W/2, 204);
+  
+  // decorative element
+  ctx.fillStyle='rgba(200,146,42,0.15)';
+  ctx.fillRect(80,218,W-160,1);
+
+  // "This is to certify..."
+  ctx.font='italic 14px Georgia,serif'; ctx.fillStyle='rgba(255,255,255,0.55)';
+  ctx.fillText('This is to certify that', W/2, 248);
+
+  // NAME — big
+  const name = document.getElementById('cert-name')?.value.trim() || 'Attendee Name';
+  ctx.font='bold 46px Georgia,serif';
+  const nameGrd = ctx.createLinearGradient(0,260,0,310);
+  nameGrd.addColorStop(0,'#FFFFFF'); nameGrd.addColorStop(1,'rgba(255,255,255,0.85)');
+  ctx.fillStyle=nameGrd;
+  // Scale down if long name
+  let fontSize = 46;
+  while(ctx.measureText(name).width > W-120 && fontSize > 24){ fontSize--; ctx.font=`bold ${fontSize}px Georgia,serif`; }
+  ctx.fillText(name, W/2, 296);
+
+  // Underline name
+  const nw = Math.min(ctx.measureText(name).width+40, W-120);
+  const ux = (W-nw)/2;
+  const uGrd = ctx.createLinearGradient(ux,0,ux+nw,0);
+  uGrd.addColorStop(0,'transparent'); uGrd.addColorStop(0.2,'#C8922A'); uGrd.addColorStop(0.8,'#C8922A'); uGrd.addColorStop(1,'transparent');
+  ctx.strokeStyle=uGrd; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(ux,306); ctx.lineTo(ux+nw,306); ctx.stroke();
+
+  // "has attended..."
+  const role = document.getElementById('cert-role')?.value.trim();
+  ctx.font='14px Poppins,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.55)';
+  if(role){
+    ctx.fillText(`has participated as ${role} in`, W/2, 336);
+  } else {
+    ctx.fillText('has successfully attended', W/2, 336);
+  }
+  ctx.font='bold 15px Poppins,sans-serif'; ctx.fillStyle='rgba(200,146,42,0.9)';
+  ctx.fillText('VOICES IN COLOR: POETRY, CREATIVITY AND COMMUNITY', W/2, 358);
+
+  // Date & venue
+  ctx.font='13px Poppins,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.4)';
+  ctx.fillText('13th June 2026  ·  Haruna Kadir Rashid New MPH, GSU, Gombe', W/2, 380);
+
+  // Bottom divider
+  ctx.strokeStyle=grd; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(80,400); ctx.lineTo(W-80,400); ctx.stroke();
+
+  // Signature area
+  const sigY = 440;
+  // Left sig
+  ctx.font='bold 13px Poppins,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.7)';
+  ctx.textAlign='center';
+  ctx.fillText('PIN President', 200, sigY);
+  ctx.font='300 11px Poppins,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.3)';
+  ctx.fillText('Poets In Nigeria', 200, sigY+16);
+  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(130,sigY-16); ctx.lineTo(270,sigY-16); ctx.stroke();
+
+  // Center stamp
+  ctx.fillStyle='rgba(46,187,90,0.1)';
+  ctx.beginPath(); ctx.arc(W/2,sigY,30,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(46,187,90,0.4)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(W/2,sigY,30,0,Math.PI*2); ctx.stroke();
+  ctx.font='bold 9px Poppins,sans-serif'; ctx.fillStyle='rgba(46,187,90,0.8)';
+  ctx.fillText('OFFICIAL', W/2, sigY-4);
+  ctx.fillText('CERTIFICATE', W/2, sigY+8);
+
+  // Right sig
+  ctx.font='bold 13px Poppins,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.7)';
+  ctx.fillText('Director', W-200, sigY);
+  ctx.font='300 11px Poppins,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.3)';
+  ctx.fillText('Teemerh Arts Foundation', W-200, sigY+16);
+  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(W-270,sigY-16); ctx.lineTo(W-130,sigY-16); ctx.stroke();
+
+  // Footer Nexa
+  ctx.font='10px Poppins,sans-serif'; ctx.fillStyle='rgba(255,255,255,0.2)';
+  ctx.fillText('Platform & Certificate Technology by Nexa Digital Solutions Ltd', W/2, H-22);
+
+  ctx.textAlign='left';
+}
+
+function downloadCert(){
+  const name = document.getElementById('cert-name').value.trim();
+  if(!name){ showToast('❌','Enter an attendee name first','error'); return; }
+  previewCert();
+  const canvas = document.getElementById('cert-canvas');
+  const imgData = canvas.toDataURL('image/jpeg',0.95);
+  const {jsPDF} = window.jspdf;
+  const pdf = new jsPDF({orientation:'landscape',unit:'px',format:[800,566]});
+  pdf.addImage(imgData,'JPEG',0,0,800,566);
+  pdf.save(`Certificate_${name.replace(/\s+/g,'_')}_PIN2026.pdf`);
+  // Mark cert as issued
+  const att = state.attendees.find(a=>a.name===name);
+  if(att){ att.certIssued=true; save(); renderAttendees(); }
+  state.certCount++; save(); updateStats();
+  showToast('🏆',`Certificate downloaded for ${name}`);
+}
+
+function bulkGenCerts(){
+  if(!state.attendees.length){ showToast('❌','No attendees registered yet','error'); return; }
+  if(!confirm(`Generate certificates for all ${state.attendees.length} attendees? They will download one by one.`)) return;
+  const {jsPDF} = window.jspdf;
+  const certType = document.getElementById('cert-type').value;
+  state.attendees.forEach((att,i)=>{
+    setTimeout(()=>{
+      document.getElementById('cert-name').value = att.name;
+      document.getElementById('cert-type').value = certType;
+      previewCert();
+      const canvas = document.getElementById('cert-canvas');
+      const imgData = canvas.toDataURL('image/jpeg',0.95);
+      const pdf = new jsPDF({orientation:'landscape',unit:'px',format:[800,566]});
+      pdf.addImage(imgData,'JPEG',0,0,800,566);
+      pdf.save(`Certificate_${att.name.replace(/\s+/g,'_')}_PIN2026.pdf`);
+      att.certIssued = true;
+      state.certCount++;
+    }, i*600);
+  });
+  setTimeout(()=>{ save(); renderAttendees(); updateStats(); showToast('🏆',`${state.attendees.length} certificates generated!`); }, state.attendees.length*600+200);
+}
+
+function exportCSV(){
+  if(!state.attendees.length){ showToast('❌','No attendees to export','error'); return; }
+  const hdr = 'ID,Name,Phone,Occupation,City,Checked In,Certificate Issued\n';
+  const rows = state.attendees.map(a=>`${a.id},"${a.name}","${a.phone||''}","${a.occ||''}","${a.city||''}",${a.checkedIn?'Yes':'No'},${a.certIssued?'Yes':'No'}`).join('\n');
+  const blob = new Blob([hdr+rows],{type:'text/csv'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='PIN_Attendees.csv'; a.click();
+  showToast('⬇','Attendees exported as CSV');
+}
+
+// ===== LIVE STAGE =====
+function renderLiveButtons(){
+  const el = document.getElementById('live-prog-buttons');
+  el.innerHTML = state.programme.map(s=>`
+  <button class="btn btn-sm" style="justify-content:space-between;text-align:left;" onclick="quickSetLive('${s.title.replace(/'/g,"\\'")}','${s.note.replace(/'/g,"\\'")}')">
+    <span style="font-size:11px;color:var(--muted);min-width:60px;">${s.time}</span>
+    <span style="flex:1;padding:0 10px;">${s.title}</span>
+    <span style="color:var(--pink);font-size:11px;">SET →</span>
+  </button>`).join('');
+}
+function populateLivePick(){
+  const sel = document.getElementById('live-prog-pick');
+  sel.innerHTML = '<option value="">— Select from programme —</option>' +
+    state.programme.map((s,i)=>`<option value="${i}">${s.time} – ${s.title}</option>`).join('');
+}
+function pickLiveProg(){
+  const i = document.getElementById('live-prog-pick').value;
+  if(i==='') return;
+  const s = state.programme[parseInt(i)];
+  document.getElementById('live-title').value = s.title;
+  document.getElementById('live-pres').value = s.note;
+}
+function quickSetLive(title,pres){
+  document.getElementById('live-title').value=title;
+  document.getElementById('live-pres').value=pres;
+  setLiveSession();
+}
+function setLiveSession(){
+  const title = document.getElementById('live-title').value.trim();
+  const pres = document.getElementById('live-pres').value.trim();
+  if(!title){ showToast('❌','Enter a session title','error'); return; }
+  state.liveSession = {title, presenter:pres};
+  save(); updateLiveDisplay(); updateStats();
+  showToast('🔴',`Live: "${title}"`);
+}
+function updateLiveDisplay(){
+  const el = document.getElementById('live-now-display');
+  if(el) el.textContent = state.liveSession.title || 'Not Set';
+  const d = document.getElementById('dash-live-session');
+  if(d) d.textContent = state.liveSession.title || 'Not Set';
+}
+
+// ===== TOAST =====
+function showToast(icon, msg, type=''){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-icon').textContent=icon;
+  document.getElementById('toast-msg').textContent=msg;
+  t.style.borderColor = type==='error' ? 'rgba(232,64,64,0.4)' : 'var(--border-gold)';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// kick off
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Sip, Paint & Poetry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #C8922A; 
+      --gold-l: #F5C842; 
+      --green: #1A7A3C; 
+      --green-l: #2EBB5A;
+      --bg: #0D0D0D; 
+      --bg2: #161616; 
+      --bg3: #1E1E1E; 
+      --bg4: #272727;
+      --border: rgba(255, 255, 255, 0.08); 
+      --border-gold: rgba(200, 146, 42, 0.3);
+      --text: #F0EDE6; 
+      --muted: rgba(240, 237, 230, 0.4); 
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .login-screen {
+      position: fixed; inset: 0; z-index: 999;
+      background: var(--bg); display: flex; align-items: center; justify-content: center;
+    }
+    .login-box {
+      width: 100%; max-width: 400px; background: var(--bg2);
+      border: 1px solid var(--border-gold); border-radius: 16px;
+      padding: 48px 40px; text-align: center;
+    }
+    .login-logo {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: rgba(200, 146, 42, 0.12); border: 2px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px; font-size: 28px;
+    }
+    .login-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 28px;
+      letter-spacing: 2px; color: var(--gold); margin-bottom: 4px;
+    }
+    .login-input {
+      width: 100%; background: var(--bg3); border: 1px solid var(--border);
+      color: var(--text); padding: 14px 16px; border-radius: 8px;
+      font-family: 'Poppins', sans-serif; font-size: 15px; margin-bottom: 14px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .login-input:focus { border-color: var(--gold); }
+    .btn-gold {
+      width: 100%; background: linear-gradient(135deg, var(--gold), var(--gold-l));
+      color: #0D0D0D; border: none; padding: 15px; border-radius: 8px;
+      font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 14px;
+      letter-spacing: 2px; text-transform: uppercase; cursor: pointer;
+      transition: transform 0.15s, opacity 0.2s;
+    }
+    .btn-gold:hover { transform: scale(1.02); opacity: 0.9; }
+
+    .app-container { display: flex; flex: 1; height: 100vh; overflow: hidden; }
+    aside {
+      width: 240px; flex-shrink: 0; background: var(--bg2);
+      border-right: 1px solid var(--border); display: flex; flex-direction: column; height: 100vh;
+    }
+    .sb-brand { padding: 24px 20px 20px; border-bottom: 1px solid var(--border); }
+    .sb-brand-name { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; color: var(--gold); }
+    main { flex: 1; overflow-y: auto; background: var(--bg); padding: 32px 36px; }
+    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 2px; color: var(--text); margin-bottom: 24px; }
+    .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+    .card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--gold); margin-bottom: 16px; letter-spacing: 1px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+    .btn {
+      background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+      padding: 10px 18px; border-radius: 8px; font-family: 'Poppins', sans-serif;
+      font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s;
+    }
+    .btn:hover { background: var(--bg4); border-color: rgba(255,255,255,0.15); }
+    
+    #dashboard { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Login Screen -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-box">
+      <div class="login-logo">🎭</div>
+      <h1 class="login-title">PIN ADMIN</h1>
+      <form id="loginForm">
+        <input type="password" id="passwordInput" class="login-input" placeholder="Enter Password" />
+        <button type="submit" class="btn-gold">Access Dashboard</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="app-container" id="dashboard">
+    <aside>
+      <div class="sb-brand">
+        <div class="sb-brand-name">PIN ADMIN</div>
+      </div>
+    </aside>
+    <main>
+      <h1 class="page-title">Admin Dashboard</h1>
+      
+      <div class="card">
+        <h3>Current Live Session</h3>
+        <div class="form-group">
+          <label>Title</label>
+          <input id="liveTitleInput" class="login-input" placeholder="Session Title" />
+        </div>
+        <div class="form-group">
+          <label>Presenter / Note</label>
+          <input id="livePresenterInput" class="login-input" placeholder="Speaker Name" />
+        </div>
+        <button class="btn btn-gold" style="width: auto;" id="setLiveBtn">Set Live</button>
+      </div>
+
+      <div class="card">
+        <h3>Game Control</h3>
+        <p style="margin-bottom: 10px; font-size: 13px;">Current Phase: <strong id="currentPhaseDisplay">lobby</strong></p>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn" onclick="updateGamePhase('lobby')">Lobby</button>
+          <button class="btn" onclick="updateGamePhase('question')">Question</button>
+          <button class="btn" onclick="updateGamePhase('reveal')">Reveal</button>
+          <button class="btn" onclick="updateGamePhase('winner')">Winner</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBXYVqnK9R5Jz7oa2cHXmrbqNlC2XhXJho",
+      authDomain: "nexa-storeos.firebaseapp.com",
+      databaseURL: "https://nexa-storeos-default-rtdb.firebaseio.com",
+      projectId: "nexa-storeos",
+      storageBucket: "nexa-storeos.firebasestorage.app",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let gameState = { phase: 'lobby', round: 1, qIndex: 0, gameStarted: false };
+
+    // Login Logic
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const pw = document.getElementById('passwordInput').value;
+      if (pw === 'admin2026') {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'flex';
+        initListeners();
+      } else {
+        alert('Invalid password');
+      }
+    });
+
+    function initListeners() {
+      // Listen to Live Session
+      onValue(ref(db, 'liveSession'), (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          document.getElementById('liveTitleInput').value = data.title || '';
+          document.getElementById('livePresenterInput').value = data.presenter || '';
+        }
+      });
+
+      // Listen to Game State
+      onValue(ref(db, 'gameState'), (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          gameState = data;
+          document.getElementById('currentPhaseDisplay').innerText = data.phase || 'lobby';
+        }
+      });
+    }
+
+    // Update Live Session
+    document.getElementById('setLiveBtn').addEventListener('click', () => {
+      const title = document.getElementById('liveTitleInput').value;
+      const presenter = document.getElementById('livePresenterInput').value;
+      set(ref(db, 'liveSession'), { title, presenter })
+        .then(() => alert('Live Session Updated!'));
+    });
+
+    // Update Game Phase
+    window.updateGamePhase = function(newPhase) {
+      set(ref(db, 'gameState'), {
+        ...gameState,
+        phase: newPhase
+      }).then(() => alert(`Game phase updated to ${newPhase}`));
+    }
+  </script>
+</body>
+</html>

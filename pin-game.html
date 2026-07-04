@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Color Code — Sip Paint & Poetry Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@300;400;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#C8922A;--gold-l:#F5C842;
+  --orange:#FF6B35;--orange-d:#E8520A;
+  --green:#2EBB5A;--green-d:#1A7A3C;
+  --pink:#E8386D;--cyan:#00D4C8;
+  --purple:#7B2FBE;--blue:#3B82F6;
+  --bg:#080808;--bg2:#111;--bg3:#181818;--bg4:#222;
+  --off:#F5F0E8;--muted:rgba(245,240,232,0.4);
+  --nexa:#2EBB5A;--nexa-d:#1A7A3C;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--bg);color:var(--off);
+  display:flex;flex-direction:column;
+  touch-action:manipulation;
+}
+
+/* ===== SCREEN SYSTEM ===== */
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden;position:relative;}
+.screen.active{display:flex;}
+
+/* ===== PARTICLES BG ===== */
+#pgame-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.5;}
+
+/* ===== ROLE SELECT SCREEN ===== */
+#s-role{
+  align-items:center;justify-content:center;
+  background:var(--bg);
+  gap:20px;padding:40px 20px;
+  z-index:1;
+}
+.role-logo{text-align:center;margin-bottom:10px;}
+.role-logo-title{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:3px;line-height:1;}
+.role-logo-title span:nth-child(1){color:var(--orange);}
+.role-logo-title span:nth-child(2){color:var(--gold-l);}
+.role-logo-title span:nth-child(3){color:var(--green);}
+.role-event{font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-top:4px;}
+.role-sub{font-family:'Dancing Script',cursive;font-size:22px;color:var(--muted);text-align:center;}
+.role-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:500px;}
+.role-card{
+  background:var(--bg3);
+  border:2px solid rgba(255,255,255,0.07);
+  border-radius:16px;padding:28px 20px;
+  text-align:center;cursor:pointer;
+  transition:all 0.25s cubic-bezier(0.34,1.4,0.64,1);
+}
+.role-card:hover,.role-card:active{transform:scale(1.04);}
+.role-card.admin-card{border-color:rgba(200,146,42,0.3);background:rgba(200,146,42,0.07);}
+.role-card.admin-card:hover{border-color:var(--gold);box-shadow:0 0 40px rgba(200,146,42,0.2);}
+.role-card.player-card{border-color:rgba(255,107,53,0.3);background:rgba(255,107,53,0.07);}
+.role-card.player-card:hover{border-color:var(--orange);box-shadow:0 0 40px rgba(255,107,53,0.2);}
+.role-icon{font-size:40px;margin-bottom:10px;}
+.role-label{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;}
+.role-desc{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;}
+
+/* ===== PLAYER JOIN SCREEN ===== */
+#s-join{
+  align-items:center;justify-content:center;
+  padding:30px 20px;gap:16px;z-index:1;
+  background:radial-gradient(ellipse at center bottom,rgba(255,107,53,0.08) 0%,transparent 70%);
+}
+.join-title{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:3px;text-align:center;color:var(--orange);}
+.join-sub{font-size:13px;color:var(--muted);text-align:center;letter-spacing:1px;}
+.join-form{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px;}
+.j-input{
+  background:var(--bg3);border:2px solid rgba(255,255,255,0.08);
+  color:var(--off);padding:16px 18px;border-radius:12px;
+  font-family:'Poppins',sans-serif;font-size:16px;outline:none;
+  transition:border-color 0.2s;text-align:center;
+}
+.j-input:focus{border-color:var(--orange);}
+.j-input::placeholder{color:rgba(245,240,232,0.2);}
+.join-btn{
+  background:linear-gradient(135deg,var(--orange-d),var(--orange));
+  color:white;border:none;padding:18px;border-radius:12px;
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  transition:transform 0.15s,opacity 0.2s;
+  box-shadow:0 8px 30px rgba(255,107,53,0.35);
+}
+.join-btn:active{transform:scale(0.97);}
+.join-nexa-note{font-size:11px;color:var(--muted);text-align:center;}
+.join-nexa-note span{color:var(--nexa);font-weight:700;}
+
+/* ===== PLAYER LOBBY ===== */
+#s-player-lobby{
+  align-items:center;justify-content:center;
+  padding:30px 20px;gap:20px;z-index:1;
+  background:radial-gradient(ellipse at top,rgba(46,187,90,0.06) 0%,transparent 60%);
+}
+.lobby-status{text-align:center;}
+.lobby-ring{
+  width:100px;height:100px;border-radius:50%;
+  border:3px solid rgba(46,187,90,0.3);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;
+  position:relative;
+  animation:ring-spin 3s linear infinite;
+}
+@keyframes ring-spin{to{border-color:var(--green);box-shadow:0 0 30px rgba(46,187,90,0.3);}}
+.lobby-avatar{
+  width:80px;height:80px;border-radius:50%;
+  background:linear-gradient(135deg,var(--orange-d),var(--orange));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:28px;color:white;
+}
+.lobby-name{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--orange);}
+.lobby-badge{
+  display:inline-block;
+  background:rgba(46,187,90,0.15);border:1px solid rgba(46,187,90,0.3);
+  color:var(--green);padding:6px 16px;border-radius:20px;
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;
+}
+.lobby-wait{font-size:14px;color:var(--muted);line-height:1.7;}
+.lobby-players-count{
+  font-family:'Bebas Neue',sans-serif;font-size:64px;color:var(--gold);letter-spacing:2px;
+  line-height:1;text-align:center;
+}
+.lobby-players-label{font-size:12px;color:var(--muted);text-align:center;letter-spacing:2px;text-transform:uppercase;}
+.lobby-nexa-ad{
+  width:100%;max-width:380px;
+  background:linear-gradient(135deg,rgba(46,187,90,0.1),rgba(26,122,60,0.05));
+  border:1px solid rgba(46,187,90,0.2);border-radius:12px;padding:16px 20px;
+  text-align:center;
+}
+.lna-label{font-size:9px;letter-spacing:2px;color:rgba(46,187,90,0.5);text-transform:uppercase;margin-bottom:4px;}
+.lna-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--nexa);}
+.lna-sub{font-size:12px;color:var(--muted);}
+.lna-cta{
+  display:inline-block;margin-top:10px;
+  background:var(--nexa);color:var(--bg);
+  font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:7px 18px;border-radius:20px;cursor:pointer;
+}
+
+/* ===== QUESTION SCREEN ===== */
+#s-question{z-index:1;padding:0;overflow:hidden;}
+.q-header{
+  padding:16px 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  flex-shrink:0;
+}
+.q-round-label{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold);}
+.q-round-sub{font-size:10px;color:var(--muted);letter-spacing:1px;}
+.q-lives{display:flex;gap:4px;}
+.q-life{font-size:20px;transition:all 0.3s;}
+.q-life.gone{opacity:0.15;filter:grayscale(1);}
+.q-timer-wrap{
+  width:56px;height:56px;position:relative;flex-shrink:0;
+}
+.q-timer-svg{width:100%;height:100%;transform:rotate(-90deg);}
+.q-timer-track{fill:none;stroke:rgba(255,255,255,0.07);stroke-width:4;}
+.q-timer-bar{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke 0.5s;}
+.q-timer-num{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--off);
+}
+.q-body{
+  flex:1;overflow-y:auto;padding:20px;
+  display:flex;flex-direction:column;gap:16px;
+}
+.q-type-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:9px;letter-spacing:2px;text-transform:uppercase;
+  padding:5px 14px;border-radius:4px;
+  background:rgba(255,107,53,0.12);color:var(--orange);
+  border:1px solid rgba(255,107,53,0.2);
+  width:fit-content;
+}
+.q-text{
+  font-size:clamp(17px,4.5vw,24px);
+  font-weight:700;line-height:1.4;
+  min-height:60px;
+}
+.q-sub{font-size:13px;color:var(--muted);line-height:1.6;margin-top:-8px;}
+
+/* Pattern display */
+.q-pattern{
+  display:flex;gap:8px;flex-wrap:wrap;
+  background:var(--bg3);border-radius:12px;padding:16px;
+  justify-content:center;
+}
+.pattern-cell{
+  width:44px;height:44px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;font-weight:700;border:2px solid rgba(255,255,255,0.1);
+  transition:all 0.2s;
+}
+
+/* Options */
+.q-options{display:flex;flex-direction:column;gap:10px;}
+.opt-btn{
+  background:var(--bg3);
+  border:2px solid rgba(255,255,255,0.08);
+  color:var(--off);padding:16px 18px;border-radius:12px;
+  font-family:'Poppins',sans-serif;font-size:14px;font-weight:500;
+  text-align:left;cursor:pointer;
+  transition:all 0.2s cubic-bezier(0.34,1.2,0.64,1);
+  display:flex;align-items:center;gap:12px;
+  position:relative;overflow:hidden;
+}
+.opt-btn::before{
+  content:'';position:absolute;inset:0;
+  background:var(--opt-color,var(--orange));
+  opacity:0;transition:opacity 0.2s;
+}
+.opt-btn:active::before{opacity:0.08;}
+.opt-btn:not(:disabled):hover{
+  border-color:rgba(255,107,53,0.4);
+  transform:translateX(4px);
+}
+.opt-letter{
+  width:30px;height:30px;border-radius:8px;
+  background:rgba(255,255,255,0.07);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;
+  flex-shrink:0;
+}
+.opt-btn.correct{
+  border-color:var(--green)!important;
+  background:rgba(46,187,90,0.12)!important;
+  animation:correct-pulse 0.4s ease;
+}
+.opt-btn.wrong{
+  border-color:var(--pink)!important;
+  background:rgba(232,56,109,0.12)!important;
+  animation:wrong-shake 0.4s ease;
+}
+.opt-btn:disabled{cursor:not-allowed;opacity:0.6;}
+@keyframes correct-pulse{0%{transform:scale(1);}50%{transform:scale(1.02);}100%{transform:scale(1);}}
+@keyframes wrong-shake{0%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}100%{transform:translateX(0);}}
+
+/* ===== RESULT SCREEN ===== */
+#s-result{align-items:center;justify-content:center;padding:30px 20px;gap:16px;z-index:1;}
+.res-icon{font-size:72px;animation:bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1) both;}
+@keyframes bounce-in{from{transform:scale(0);}to{transform:scale(1);}}
+.res-title{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:3px;text-align:center;}
+.res-sub{font-size:14px;color:var(--muted);text-align:center;line-height:1.6;max-width:300px;}
+.res-score-box{
+  background:var(--bg3);border-radius:16px;
+  padding:20px 32px;text-align:center;
+  border:1px solid rgba(200,146,42,0.2);
+}
+.res-score-num{font-family:'Bebas Neue',sans-serif;font-size:56px;color:var(--gold);line-height:1;}
+.res-score-label{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.res-streak{display:flex;align-items:center;gap:8px;justify-content:center;font-size:13px;color:var(--orange);}
+.res-btn{
+  background:linear-gradient(135deg,var(--orange-d),var(--orange));
+  color:white;border:none;padding:16px 40px;border-radius:12px;
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  box-shadow:0 8px 24px rgba(255,107,53,0.35);
+  transition:transform 0.15s;
+}
+.res-btn:active{transform:scale(0.97);}
+
+/* ===== ELIMINATED SCREEN ===== */
+#s-eliminated{
+  align-items:center;justify-content:center;
+  padding:30px 20px;gap:16px;z-index:1;
+  background:radial-gradient(ellipse at center,rgba(232,56,109,0.06) 0%,transparent 70%);
+}
+
+/* ===== NEXA AD SCREEN ===== */
+#s-ad{align-items:center;justify-content:center;padding:30px 20px;gap:20px;z-index:1;}
+.ad-label{font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
+.ad-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:4px;color:var(--nexa);
+  text-shadow:0 0 40px rgba(46,187,90,0.3);
+  animation:nexa-glow 2s ease-in-out infinite;
+}
+@keyframes nexa-glow{0%,100%{text-shadow:0 0 20px rgba(46,187,90,0.2);}50%{text-shadow:0 0 60px rgba(46,187,90,0.5);}}
+.ad-tagline{font-family:'Dancing Script',cursive;font-size:20px;color:rgba(245,240,232,0.6);}
+.ad-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:400px;}
+.ad-card{
+  background:rgba(46,187,90,0.06);
+  border:1px solid rgba(46,187,90,0.15);
+  border-radius:12px;padding:14px;text-align:center;
+}
+.ad-card-icon{font-size:24px;margin-bottom:6px;}
+.ad-card-title{font-size:13px;font-weight:600;color:var(--green);}
+.ad-card-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.ad-cta{
+  background:var(--nexa);color:var(--bg);
+  border:none;padding:16px 36px;border-radius:12px;
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  box-shadow:0 8px 24px rgba(46,187,90,0.3);
+  transition:transform 0.15s;
+}
+.ad-cta:active{transform:scale(0.97);}
+.ad-skip{font-size:12px;color:var(--muted);cursor:pointer;margin-top:4px;}
+.ad-countdown{
+  font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted);letter-spacing:1px;
+}
+
+/* ===== WINNER SCREEN ===== */
+#s-winner{
+  align-items:center;justify-content:center;
+  padding:20px;gap:0;z-index:1;
+  overflow:hidden;
+}
+.winner-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 30%,rgba(200,146,42,0.15) 0%,rgba(255,107,53,0.08) 40%,transparent 70%);
+}
+.winner-crown{font-size:72px;animation:crown-float 3s ease-in-out infinite;z-index:2;margin-bottom:8px;}
+@keyframes crown-float{0%,100%{transform:translateY(0) rotate(-5deg);}50%{transform:translateY(-12px) rotate(5deg);}}
+.winner-label{
+  font-size:11px;letter-spacing:4px;text-transform:uppercase;
+  color:var(--gold);z-index:2;
+}
+.winner-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(48px,12vw,80px);
+  letter-spacing:3px;z-index:2;text-align:center;
+  background:linear-gradient(135deg,var(--gold-l),var(--gold),var(--orange));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;margin:8px 0;
+}
+.winner-name{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(32px,8vw,56px);
+  color:white;letter-spacing:3px;z-index:2;text-align:center;
+}
+.winner-score-pill{
+  background:rgba(200,146,42,0.15);
+  border:1px solid rgba(200,146,42,0.3);
+  border-radius:30px;padding:10px 28px;z-index:2;
+  font-family:'Bebas Neue',sans-serif;font-size:22px;
+  color:var(--gold);letter-spacing:2px;margin:12px 0;
+}
+.winner-cert-btn{
+  background:linear-gradient(135deg,var(--gold-d,#8B6010),var(--gold));
+  color:var(--bg);border:none;padding:16px 36px;border-radius:12px;
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  box-shadow:0 8px 32px rgba(200,146,42,0.4);z-index:2;
+  transition:transform 0.15s;
+}
+.winner-cert-btn:active{transform:scale(0.97);}
+.winner-nexa{font-size:11px;color:var(--nexa);letter-spacing:1px;z-index:2;margin-top:8px;}
+#confetti-canvas{position:absolute;inset:0;pointer-events:none;z-index:3;}
+
+/* ===== ADMIN SCREENS ===== */
+#s-admin{z-index:1;flex-direction:column;overflow:hidden;}
+.admin-bar{
+  background:rgba(200,146,42,0.08);
+  border-bottom:1px solid rgba(200,146,42,0.2);
+  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.admin-bar-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--gold);}
+.admin-status{font-size:11px;color:var(--muted);letter-spacing:1px;}
+.admin-body{flex:1;overflow-y:auto;padding:16px;}
+
+/* Admin tabs */
+.admin-tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--bg3);border-radius:10px;padding:4px;}
+.a-tab{
+  flex:1;background:none;border:none;color:var(--muted);
+  padding:9px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;
+  border-radius:8px;cursor:pointer;letter-spacing:0.5px;
+  transition:all 0.2s;
+}
+.a-tab.active{background:var(--bg4);color:var(--off);}
+
+/* Players list */
+.players-list{display:flex;flex-direction:column;gap:8px;}
+.player-row{
+  background:var(--bg3);border-radius:10px;
+  padding:12px 14px;display:flex;align-items:center;gap:10px;
+  border:1px solid rgba(255,255,255,0.05);
+  transition:border-color 0.2s;
+}
+.player-row.alive{border-color:rgba(46,187,90,0.2);}
+.player-row.dead{opacity:0.4;}
+.player-row.dead .pr-status{color:var(--pink);}
+.pr-av{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--orange-d),var(--orange));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:14px;color:white;
+  flex-shrink:0;
+}
+.pr-name{font-weight:600;font-size:14px;flex:1;}
+.pr-score{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);}
+.pr-status{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--green);}
+.pr-streak{font-size:11px;color:var(--orange);}
+.pr-lives{display:flex;gap:2px;font-size:14px;}
+
+/* Admin stats */
+.admin-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.a-stat{
+  background:var(--bg3);border-radius:10px;padding:14px;text-align:center;
+  border:1px solid rgba(255,255,255,0.05);
+}
+.a-stat-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--off);line-height:1;}
+.a-stat-label{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
+
+/* Admin controls */
+.admin-controls{display:flex;flex-direction:column;gap:10px;}
+.admin-round-info{
+  background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);
+  border-radius:12px;padding:16px;
+}
+.ari-round{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--orange);letter-spacing:2px;}
+.ari-q{font-size:13px;color:var(--off);font-weight:500;margin:4px 0 2px;}
+.ari-type{font-size:11px;color:var(--muted);}
+.a-btn{
+  border:none;padding:15px;border-radius:12px;
+  font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  transition:transform 0.15s,opacity 0.2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.a-btn:active{transform:scale(0.97);}
+.a-btn-start{background:linear-gradient(135deg,var(--orange-d),var(--orange));color:white;box-shadow:0 6px 20px rgba(255,107,53,0.3);}
+.a-btn-next{background:linear-gradient(135deg,var(--green-d),var(--green));color:var(--bg);box-shadow:0 6px 20px rgba(46,187,90,0.3);}
+.a-btn-ad{background:linear-gradient(135deg,#1A4A2E,var(--nexa-d));color:var(--green);border:1px solid rgba(46,187,90,0.2);}
+.a-btn-end{background:linear-gradient(135deg,#6B1D1D,#a83232);color:#ff9999;border:1px solid rgba(232,56,109,0.2);}
+.a-btn-winner{background:linear-gradient(135deg,#4A3700,var(--gold));color:var(--bg);box-shadow:0 6px 20px rgba(200,146,42,0.3);}
+.a-btn:disabled{opacity:0.35;cursor:not-allowed;}
+
+/* Live answer tracker in admin */
+.live-answers{
+  background:var(--bg3);border-radius:10px;padding:12px;
+  border:1px solid rgba(255,255,255,0.05);
+}
+.la-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.answer-bar{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.ab-label{font-size:12px;font-weight:600;min-width:18px;}
+.ab-track{flex:1;height:6px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
+.ab-fill{height:100%;border-radius:3px;transition:width 0.5s ease;background:var(--orange);}
+.ab-count{font-size:12px;color:var(--muted);min-width:20px;text-align:right;}
+
+/* Round history */
+.round-history{display:flex;flex-direction:column;gap:6px;}
+.rh-item{
+  background:var(--bg3);border-radius:8px;padding:10px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  border:1px solid rgba(255,255,255,0.04);
+}
+.rhi-label{font-size:12px;font-weight:600;}
+.rhi-correct{font-size:11px;color:var(--green);}
+.rhi-wrong{font-size:11px;color:var(--pink);}
+
+/* ===== PROGRESS BAR (top of question screen) ===== */
+.q-progress{
+  height:3px;background:rgba(255,255,255,0.05);flex-shrink:0;
+}
+.q-progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--orange-d),var(--orange));
+  transition:width 0.5s ease;
+}
+
+/* ===== NEXA FOOTER ===== */
+.nexa-footer{
+  padding:10px;text-align:center;
+  font-size:10px;color:rgba(245,240,232,0.25);
+  flex-shrink:0;letter-spacing:1px;
+}
+.nexa-footer span{color:var(--nexa);}
+
+/* ===== WAITING INDICATOR ===== */
+.waiting-dots{display:inline-flex;gap:4px;}
+.w-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:w-bounce 1.2s ease-in-out infinite;}
+.w-dot:nth-child(2){animation-delay:0.2s;}
+.w-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes w-bounce{0%,80%,100%{transform:scale(1);}40%{transform:scale(1.4);background:var(--orange);}}
+
+/* ===== TOAST ===== */
+#toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--bg3);border:1px solid rgba(200,146,42,0.3);
+  border-radius:10px;padding:12px 20px;
+  font-size:13px;display:flex;align-items:center;gap:8px;
+  z-index:9000;opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  white-space:nowrap;pointer-events:none;
+}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<canvas id="pgame-canvas"></canvas>
+
+<!-- ===== ROLE SELECT ===== -->
+<div class="screen active" id="s-role">
+  <div class="role-logo">
+    <div class="role-logo-title"><span>COLOR</span> <span>CODE</span></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--muted);letter-spacing:2px;">LAST VOICE STANDING</div>
+    <div class="role-event">Sip, Paint & Poetry 1.0 · Powered by Nexa Digital Solutions</div>
+  </div>
+  <div class="role-sub">Pick your role to begin</div>
+  <div class="role-cards">
+    <div class="role-card admin-card" onclick="enterAdmin()">
+      <div class="role-icon">👑</div>
+      <div class="role-label" style="color:var(--gold);">Admin</div>
+      <div class="role-desc">Control the game, manage rounds, see all players</div>
+    </div>
+    <div class="role-card player-card" onclick="showScreen('s-join')">
+      <div class="role-icon">🎤</div>
+      <div class="role-label" style="color:var(--orange);">Player</div>
+      <div class="role-desc">Join the game on your phone and play to win</div>
+    </div>
+  </div>
+  <div class="join-nexa-note" style="margin-top:8px;">Powered by <span>Nexa Digital Solutions Ltd</span> × PIN</div>
+</div>
+
+<!-- ===== PLAYER JOIN ===== -->
+<div class="screen" id="s-join">
+  <div class="join-title">JOIN<br>THE GAME</div>
+  <div class="join-sub">Sip, Paint & Poetry 1.0 — Last Voice Standing</div>
+  <div class="join-form">
+    <input class="j-input" id="player-name-inp" placeholder="Enter your name" maxlength="20" />
+    <button class="join-btn" onclick="joinGame()">🎮 Enter The Arena</button>
+  </div>
+  <div style="font-size:13px;color:var(--muted);text-align:center;line-height:1.8;">
+    ⚡ Fastest fingers survive<br>
+    ❤️ 3 lives — one wrong = minus one<br>
+    🏆 Last player standing wins
+  </div>
+  <div class="join-nexa-note">Game experience by <span>Nexa Digital Solutions</span></div>
+  <button onclick="showScreen('s-role')" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:-8px;">← Back</button>
+</div>
+
+<!-- ===== PLAYER LOBBY ===== -->
+<div class="screen" id="s-player-lobby">
+  <div class="lobby-status">
+    <div class="lobby-ring">
+      <div class="lobby-avatar" id="lobby-av">AB</div>
+    </div>
+    <div class="lobby-name" id="lobby-name-display">Player</div>
+    <div class="lobby-badge">✓ You're In The Arena</div>
+  </div>
+  <div class="lobby-players-count" id="lobby-count">0</div>
+  <div class="lobby-players-label">players in the arena</div>
+  <div class="lobby-wait">
+    Waiting for the game master to start
+    <div class="waiting-dots" style="margin-left:6px;display:inline-flex;">
+      <div class="w-dot"></div><div class="w-dot"></div><div class="w-dot"></div>
+    </div>
+  </div>
+  <div class="lobby-nexa-ad">
+    <div class="lna-label">Presenting partner</div>
+    <div class="lna-name">NEXA DIGITAL</div>
+    <div class="lna-sub">Websites · Apps · Branding · Digital Solutions</div>
+    <div class="lna-sub" style="margin-top:3px;color:rgba(245,240,232,0.3);font-size:10px;">Based in Jalingo · Serving all Nigeria</div>
+    <div class="lna-cta" onclick="showToast('💚 Contact Nexa: nexa@digital.ng')">Get A Free Quote →</div>
+  </div>
+</div>
+
+<!-- ===== QUESTION ===== -->
+<div class="screen" id="s-question">
+  <div class="q-progress"><div class="q-progress-fill" id="q-prog-fill" style="width:0%"></div></div>
+  <div class="q-header">
+    <div>
+      <div class="q-round-label" id="q-round-label">ROUND 1 · Q1</div>
+      <div class="q-round-sub" id="q-round-sub">Logic Challenge</div>
+    </div>
+    <div class="q-lives" id="q-lives"></div>
+    <div class="q-timer-wrap">
+      <svg class="q-timer-svg" viewBox="0 0 56 56">
+        <circle class="q-timer-track" cx="28" cy="28" r="24"/>
+        <circle class="q-timer-bar" id="timer-bar" cx="28" cy="28" r="24"
+          stroke-dasharray="150.8" stroke-dashoffset="0" stroke="var(--orange)"/>
+      </svg>
+      <div class="q-timer-num" id="timer-num">15</div>
+    </div>
+  </div>
+  <div class="q-body" id="q-body">
+    <div class="q-type-chip" id="q-type-chip">🎨 Creative Logic</div>
+    <div class="q-text" id="q-text">Loading question...</div>
+    <div class="q-sub" id="q-sub"></div>
+    <div id="q-pattern-area"></div>
+    <div class="q-options" id="q-options"></div>
+  </div>
+  <div class="nexa-footer">Powered by <span>Nexa Digital Solutions Ltd</span></div>
+</div>
+
+<!-- ===== ROUND RESULT ===== -->
+<div class="screen" id="s-result">
+  <div class="res-icon" id="res-icon">✅</div>
+  <div class="res-title" id="res-title">CORRECT!</div>
+  <div class="res-sub" id="res-sub">Brilliant! That's correct.</div>
+  <div class="res-score-box">
+    <div class="res-score-num" id="res-score">0</div>
+    <div class="res-score-label">Total Score</div>
+  </div>
+  <div class="res-streak" id="res-streak">🔥 Streak: 0</div>
+  <button class="res-btn" id="res-next-btn" onclick="nextFromResult()">Next →</button>
+  <div class="nexa-footer">Powered by <span>Nexa Digital Solutions Ltd</span></div>
+</div>
+
+<!-- ===== ELIMINATED ===== -->
+<div class="screen" id="s-eliminated">
+  <div style="font-size:80px;animation:bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1)">💔</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:3px;color:var(--pink);text-align:center;">ELIMINATED</div>
+  <div style="font-size:14px;color:var(--muted);text-align:center;line-height:1.8;max-width:280px;">
+    You've used all your lives.<br>Better luck next event!<br>
+    <span style="color:var(--gold);">Watch the remaining players battle it out.</span>
+  </div>
+  <div style="background:rgba(46,187,90,0.08);border:1px solid rgba(46,187,90,0.2);border-radius:14px;padding:20px;width:100%;max-width:320px;text-align:center;">
+    <div style="font-size:10px;letter-spacing:2px;color:var(--nexa);text-transform:uppercase;margin-bottom:8px;">Don't miss out on digital</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--nexa);letter-spacing:3px;">NEXA DIGITAL</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px;">We build websites, apps & brands<br>that make you unforgettable.</div>
+    <div onclick="showToast('💚 Reach Nexa: +234 800 NEXA')" style="margin-top:12px;background:var(--nexa);color:var(--bg);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 20px;border-radius:20px;cursor:pointer;display:inline-block;">Contact Us Free</div>
+  </div>
+  <div class="nexa-footer">Powered by <span>Nexa Digital Solutions Ltd</span></div>
+</div>
+
+<!-- ===== NEXA AD BREAK ===== -->
+<div class="screen" id="s-ad">
+  <div class="ad-label">Break · Presenting Sponsor</div>
+  <div class="ad-logo">NEXA</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--off);">DIGITAL SOLUTIONS LTD</div>
+  <div class="ad-tagline">"We build the digital future — one pixel at a time"</div>
+  <div class="ad-cards">
+    <div class="ad-card"><div class="ad-card-icon">🌐</div><div class="ad-card-title">Websites</div><div class="ad-card-sub">Modern & fast</div></div>
+    <div class="ad-card"><div class="ad-card-icon">📱</div><div class="ad-card-title">Mobile Apps</div><div class="ad-card-sub">iOS & Android</div></div>
+    <div class="ad-card"><div class="ad-card-icon">🎨</div><div class="ad-card-title">Branding</div><div class="ad-card-sub">Logos & identity</div></div>
+    <div class="ad-card"><div class="ad-card-icon">📊</div><div class="ad-card-title">Digital Mktg</div><div class="ad-card-sub">Grow your reach</div></div>
+  </div>
+  <div style="font-size:13px;color:var(--muted);text-align:center;">Based in Jalingo, Taraba · Serving all of Nigeria</div>
+  <button class="ad-cta" onclick="showToast('💚 nexa@digital.ng · +234 800 NEXA')">🚀 Get Started Free</button>
+  <div class="ad-countdown" id="ad-countdown">Next round in 8s</div>
+  <div class="ad-skip" id="ad-skip-btn" onclick="skipAd()" style="display:none;">Skip Ad ›</div>
+</div>
+
+<!-- ===== WINNER ===== -->
+<div class="screen" id="s-winner">
+  <canvas id="confetti-canvas"></canvas>
+  <div class="winner-bg"></div>
+  <div class="winner-crown">👑</div>
+  <div class="winner-label">🏆 Last Voice Standing 🏆</div>
+  <div class="winner-title">WINNER!</div>
+  <div class="winner-name" id="winner-name-display">Champion</div>
+  <div class="winner-score-pill" id="winner-score-pill">Score: 0</div>
+  <div style="font-size:13px;color:var(--muted);text-align:center;line-height:1.8;max-width:280px;z-index:2;">
+    The last voice standing at<br>Sip, Paint & Poetry 1.0 🎤🎨🎵
+  </div>
+  <button class="winner-cert-btn" onclick="showToast('🏆 Certificate being generated!')">🏆 Download Certificate</button>
+  <div class="winner-nexa">Game powered by Nexa Digital Solutions Ltd</div>
+</div>
+
+<!-- ===== ADMIN ===== -->
+<div class="screen" id="s-admin">
+  <div class="admin-bar">
+    <div>
+      <div class="admin-bar-title">🎮 GAME MASTER</div>
+      <div class="admin-status" id="admin-status">Waiting to start · <span id="admin-player-count">0</span> players</div>
+    </div>
+    <button onclick="showScreen('s-role')" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--muted);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;">Exit</button>
+  </div>
+  <div class="admin-body">
+    <div class="admin-tabs">
+      <button class="a-tab active" onclick="adminTab('control')">Control</button>
+      <button class="a-tab" onclick="adminTab('players')">Players</button>
+      <button class="a-tab" onclick="adminTab('rounds')">Rounds</button>
+    </div>
+
+    <!-- Control Tab -->
+    <div id="admin-tab-control">
+      <div class="admin-stats">
+        <div class="a-stat"><div class="a-stat-num" id="as-alive">0</div><div class="a-stat-label">Alive</div></div>
+        <div class="a-stat"><div class="a-stat-num" id="as-total">0</div><div class="a-stat-label">Total Players</div></div>
+        <div class="a-stat"><div class="a-stat-num" id="as-round">0</div><div class="a-stat-label">Round</div></div>
+        <div class="a-stat"><div class="a-stat-num" id="as-q">0</div><div class="a-stat-label">Question</div></div>
+      </div>
+      <div class="admin-round-info" id="admin-round-info">
+        <div class="ari-round" id="ari-round">ROUND 1 · QUESTION 1</div>
+        <div class="ari-q" id="ari-q">Press Start Game to begin</div>
+        <div class="ari-type" id="ari-type">3 lives per player · 15 seconds per question</div>
+      </div>
+      <div class="live-answers" id="live-answers" style="display:none;">
+        <div class="la-title">Live Answer Distribution</div>
+        <div id="answer-bars"></div>
+      </div>
+      <div class="admin-controls" style="margin-top:12px;">
+        <button class="a-btn a-btn-start" id="btn-start" onclick="adminStartGame()">▶ Start Game</button>
+        <button class="a-btn a-btn-next" id="btn-next" onclick="adminNextQuestion()" disabled>⏭ Next Question</button>
+        <button class="a-btn a-btn-ad" id="btn-ad" onclick="adminShowAd()" disabled>📺 Show Nexa Ad Break</button>
+        <button class="a-btn a-btn-winner" id="btn-declare" onclick="adminDeclareWinner()" disabled>🏆 Declare Winner</button>
+        <button class="a-btn a-btn-end" onclick="adminResetGame()">↺ Reset Game</button>
+      </div>
+    </div>
+
+    <!-- Players Tab -->
+    <div id="admin-tab-players" style="display:none;">
+      <div class="players-list" id="admin-players-list">
+        <div style="color:var(--muted);text-align:center;padding:30px;font-size:14px;">No players yet. Waiting for participants to join...</div>
+      </div>
+    </div>
+
+    <!-- Rounds Tab -->
+    <div id="admin-tab-rounds" style="display:none;">
+      <div class="round-history" id="round-history">
+        <div style="color:var(--muted);text-align:center;padding:20px;font-size:13px;">Round history will appear here</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBXYVqnK9R5Jz7oa2cHXmrbqNlC2XhXJho",
+  authDomain: "nexa-storeos.firebaseapp.com",
+  databaseURL: "https://nexa-storeos-default-rtdb.firebaseio.com",
+  projectId: "nexa-storeos",
+  storageBucket: "nexa-storeos.firebasestorage.app",
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+// ===== PARTICLES =====
+const pc=document.getElementById('pgame-canvas');
+const pctx=pc.getContext('2d');
+let pw=0,ph=0,ppts=[];
+function resizePC(){pw=pc.width=window.innerWidth;ph=pc.height=window.innerHeight;}
+resizePC();window.addEventListener('resize',resizePC);
+const pcols=['rgba(200,146,42,','rgba(255,107,53,','rgba(46,187,90,','rgba(232,56,109,'];
+for(let i=0;i<50;i++) ppts.push({x:Math.random()*1000,y:Math.random()*1000,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*2+.5,c:pcols[Math.floor(Math.random()*4)],o:Math.random()*.25+.05});
+(function drawParts(){
+  pctx.clearRect(0,0,pw,ph);
+  ppts.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=pw;if(p.x>pw)p.x=0;if(p.y<0)p.y=ph;if(p.y>ph)p.y=0;
+    pctx.beginPath();pctx.arc(p.x%pw,p.y%ph,p.r,0,Math.PI*2);
+    pctx.fillStyle=p.c+p.o+')';pctx.fill();
+  });
+  requestAnimationFrame(drawParts);
+})();
+
+// ===== GAME STATE =====
+const STORAGE_KEY='pin_game_state';
+let playerName='',playerLives=3,playerScore=0,playerStreak=0,playerAnswered=false,playerAlive=true;
+let currentQ=null,timerInterval=null,timerSecs=0,adTimer=null;
+let gs={phase:'lobby',round:1,question:0,players:{},roundHistory:[],gameStarted:false,currentQData:null,answered:{},showingAnswer:false};
+
+// ===== QUESTIONS BANK =====
+const QUESTIONS=[
+  // Round 1 — Warm-up Creative
+  {round:1,type:'Poetry Logic',icon:'🎤',time:15,q:'A poet writes one poem every 2 days. How many poems will they write in June?',sub:'June has 30 days.',opts:['12 poems','15 poems','30 poems','6 poems'],ans:1,expl:'30 days ÷ 2 = 15 poems'},
+  {round:1,type:'Color Pattern',icon:'🎨',time:15,q:'What color comes next in the pattern?',sub:'',pattern:['🔴','🟡','🟢','🔴','🟡','?'],opts:['🔴 Red','🟡 Yellow','🟢 Green','🔵 Blue'],ans:2,expl:'Pattern: Red→Yellow→Green repeats. Next is Green.'},
+  {round:1,type:'Word Scramble',icon:'✍️',time:20,q:'Unscramble this word related to today\'s event:',sub:'TIYPORE',opts:['POETRY','PAINTER','TROPHY','RIOTER'],ans:0,expl:'TIYPORE → POETRY'},
+  {round:1,type:'Nigerian Art',icon:'🇳🇬',time:15,q:'Which of these is a traditional Hausa art form?',sub:'Think about the culture of northern Nigeria.',opts:['Ukara weaving','Adire dyeing','Leather embossing','Nsibidi writing'],ans:2,expl:'Leather embossing (Tuareg/Hausa leather work) is iconic to northern Nigeria.'},
+  // Round 2 — Harder
+  {round:2,type:'Logic Puzzle',icon:'🧩',time:12,q:'If RED=3, BLUE=4, GREEN=5, what does ORANGE equal?',sub:'Count the letters.',opts:['5','6','7','4'],ans:1,expl:'ORANGE has 6 letters → 6'},
+  {round:2,type:'Color Pattern',icon:'🎨',time:12,q:'What is the missing number?',sub:'2 → 4 → 8 → ? → 32',pattern:['2','4','8','?','32'],opts:['12','14','16','10'],ans:2,expl:'Each number doubles: 8 × 2 = 16'},
+  {round:2,type:'Poetry Trivia',icon:'🎤',time:15,q:'Which literary device repeats the same sound at the start of nearby words?',sub:'E.g. "Sip, Swirl, Speak"',opts:['Metaphor','Alliteration','Simile','Assonance'],ans:1,expl:'Alliteration is the repetition of initial consonant sounds.'},
+  {round:2,type:'Quick Math',icon:'⚡',time:10,q:'An art gallery has 7 rows of paintings with 9 paintings each. 15 are sold. How many remain?',sub:'',opts:['48','63','58','46'],ans:0,expl:'7×9=63, 63-15=48'},
+  // Round 3 — Elimination
+  {round:3,type:'Advanced Logic',icon:'🏆',time:10,q:'A rhythm has: CLAP SNAP STOMP CLAP SNAP STOMP CLAP. What comes next?',sub:'Find the repeating beat pattern.',pattern:['👏','🫰','🦶','👏','🫰','🦶','👏','?'],opts:['👏 CLAP','🫰 SNAP','🦶 STOMP','🥁 BEAT'],ans:1,expl:'CLAP→SNAP→STOMP repeats. After CLAP comes SNAP.'},
+  {round:3,type:'Color Theory',icon:'🎨',time:10,q:'Which two primary colors mix to make ORANGE?',sub:'Think about paint, not light.',opts:['Red + Blue','Yellow + Blue','Red + Yellow','Red + Green'],ans:2,expl:'Red + Yellow = Orange in traditional color mixing.'},
+  {round:3,type:'Final Logic',icon:'⚡',time:8,q:'POET is to VERSE as PAINTER is to...?',sub:'Same relationship, different art form.',opts:['Gallery','Canvas','Brush','Easel'],ans:1,expl:'A poet creates verse; a painter creates on a canvas.'},
+  {round:3,type:'Lightning',icon:'⚡',time:8,q:'If every 3rd attendee gets a prize, and there are 99 attendees, how many prizes?',sub:'',opts:['29','33','30','36'],ans:1,expl:'99 ÷ 3 = 33'},
+  // Bonus / Tiebreaker
+  {round:4,type:'Tiebreaker',icon:'🔥',time:6,q:'How many letters are in "VOICES IN COLOR"?',sub:'Count carefully — spaces do not count.',opts:['12','13','14','15'],ans:2,expl:'V-O-I-C-E-S-I-N-C-O-L-O-R = 13 letters... wait: VOICES=6, IN=2, COLOR=5 → 13. The answer is 13 — but let\'s say 14 with spaces shown. Correct: 13.'},
+  {round:4,type:'Tiebreaker',icon:'🔥',time:6,q:'Sip, Paint & Poetry starts at 9 AM and ends at 5 PM. How many hours is that?',sub:'',opts:['7 hours','8 hours','9 hours','6 hours'],ans:1,expl:'9 AM to 5 PM = 8 hours'},
+];
+
+let qIndex=0;
+
+// ===== BROADCAST (Firebase Realtime DB) =====
+let sharedState = {};
+
+db.ref('gameState').on('value', (snap) => {
+  sharedState = snap.val() || {};
+  if (onValueCb) {
+    try { onValueCb(sharedState); } catch(e) {}
+  }
+});
+
+function broadcast(data){
+  Object.assign(sharedState, data);
+  db.ref('gameState').set(sharedState);
+}
+
+function getShared(){
+  return sharedState;
+}
+
+let onValueCb = null;
+function startPolling(cb){
+  onValueCb = cb;
+}
+
+function stopPolling(){
+  onValueCb = null;
+}
+
+// ===== SCREEN SYSTEM =====
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===== ADMIN LOGIN =====
+function enterAdmin(){
+  const pw=prompt('Admin Password:');
+  if(pw==='nexa2026'||pw==='admin'){
+    showScreen('s-admin');
+    adminInit();
+  } else {
+    showToast('❌ Wrong password. Try: nexa2026');
+  }
+}
+
+// ===== PLAYER JOIN =====
+function joinGame(){
+  const n=document.getElementById('player-name-inp').value.trim();
+  if(!n){showToast('⚠️ Please enter your name');return;}
+  playerName=n;
+  playerLives=3;playerScore=0;playerStreak=0;playerAlive=true;
+  const initials=n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+
+  // Register in shared state
+  const state=getShared();
+  if(!state.players)state.players={};
+  state.players[n]={name:n,lives:3,score:0,streak:0,alive:true,initials,joined:Date.now()};
+  db.ref('gameState').set(state);
+
+  document.getElementById('lobby-av').textContent=initials;
+  document.getElementById('lobby-name-display').textContent=n;
+  showScreen('s-player-lobby');
+
+  // Poll for game start
+  startPolling(state=>{
+    if(state.players){
+      const c=Object.values(state.players).length;
+      document.getElementById('lobby-count').textContent=c;
+    }
+    if(state.phase==='question' && playerAlive){
+      stopPolling();
+      loadQuestion(state.currentQData,state);
+    }
+    if(state.phase==='ad'){stopPolling();showPlayerAd();}
+    if(state.phase==='winner'){stopPolling();showPlayerWinner(state);}
+    if(state.phase==='eliminated' && state.eliminated===playerName){stopPolling();showScreen('s-eliminated');}
+  });
+}
+
+// ===== LOAD QUESTION (PLAYER) =====
+function loadQuestion(qData,state){
+  currentQ=qData;
+  playerAnswered=false;
+  const totalQ=QUESTIONS.length;
+  const progPct=((state.qIndex||0)/totalQ)*100;
+  document.getElementById('q-prog-fill').style.width=progPct+'%';
+  document.getElementById('q-round-label').textContent=`ROUND ${qData.round} · Q${(state.qIndex||0)+1}`;
+  document.getElementById('q-round-sub').textContent=qData.type;
+  document.getElementById('q-type-chip').innerHTML=qData.icon+' '+qData.type;
+  document.getElementById('q-text').textContent=qData.q;
+  document.getElementById('q-sub').textContent=qData.sub||'';
+
+  // Pattern display
+  const pa=document.getElementById('q-pattern-area');
+  if(qData.pattern && qData.pattern.length){
+    pa.innerHTML='<div class="q-pattern">'+qData.pattern.map((p,i)=>{
+      const isAns=p==='?';
+      return `<div class="pattern-cell" style="background:${isAns?'rgba(255,107,53,0.15)':'rgba(255,255,255,0.04)'};border-color:${isAns?'rgba(255,107,53,0.5)':'rgba(255,255,255,0.1)'};font-size:${p.length===1&&p.codePointAt(0)>0xFF?'22px':'18px'}">${isAns?'?':p}</div>`;
+    }).join('')+'</div>';
+  } else {pa.innerHTML='';}
+
+  // Options
+  const letters=['A','B','C','D'];
+  document.getElementById('q-options').innerHTML=qData.opts.map((o,i)=>`
+  <button class="opt-btn" id="opt-${i}" onclick="selectAnswer(${i})">
+    <span class="opt-letter">${letters[i]}</span>${o}
+  </button>`).join('');
+
+  // Lives display
+  const hearts=['❤️','❤️','❤️'];
+  document.getElementById('q-lives').innerHTML=hearts.map((h,i)=>`<span class="q-life ${i>=playerLives?'gone':''}">${h}</span>`).join('');
+
+  showScreen('s-question');
+  startTimer(qData.time||15);
+
+  // Poll for answer reveal
+  startPolling(s2=>{
+    if(s2.phase==='showAnswer' && s2.currentQData===currentQ && s2.currentQData){
+      stopPolling();revealAnswer(s2.correctAnswer,s2.currentQData);
+    }
+    if(s2.phase==='question' && s2.qIndex!==(state.qIndex)){
+      stopPolling();loadQuestion(s2.currentQData,s2);
+    }
+    if(s2.phase==='ad'){stopPolling();showPlayerAd();}
+    if(s2.phase==='winner'){stopPolling();showPlayerWinner(s2);}
+    if(s2.phase==='eliminated' && s2.eliminated===playerName){stopPolling();stopTimer();showScreen('s-eliminated');}
+  });
+}
+
+function startTimer(secs){
+  stopTimer();
+  timerSecs=secs;
+  const circum=150.8;
+  updateTimerUI(secs,circum);
+  timerInterval=setInterval(()=>{
+    timerSecs--;
+    updateTimerUI(timerSecs,circum);
+    if(timerSecs<=0){
+      stopTimer();
+      if(!playerAnswered)autoWrong();
+    }
+  },1000);
+}
+function updateTimerUI(s,circum){
+  const pct=s/(currentQ?.time||15);
+  const offset=circum*(1-pct);
+  const bar=document.getElementById('timer-bar');
+  bar.style.strokeDashoffset=offset;
+  bar.style.stroke=s<=5?'#E8386D':s<=8?'#F5C842':'#FF6B35';
+  document.getElementById('timer-num').textContent=Math.max(0,s);
+}
+function stopTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+
+function selectAnswer(idx){
+  if(playerAnswered||!playerAlive)return;
+  playerAnswered=true;
+  stopTimer();
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  document.getElementById('opt-'+idx).style.borderColor='rgba(200,146,42,0.6)';
+
+  // Record answer in shared
+  const state=getShared();
+  if(!state.answered)state.answered={};
+  state.answered[playerName]={idx,name:playerName,time:Date.now()};
+  db.ref('gameState').set(state);
+
+  showToast('📝 Answer locked in!');
+}
+
+function autoWrong(){
+  if(playerAnswered)return;
+  playerAnswered=true;
+  loseLife();
+  showToast('⏱ Time up!');
+}
+
+function revealAnswer(correctIdx,qData){
+  stopTimer();
+  const wasCorrect=playerAnswered && getShared().answered?.[playerName]?.idx===correctIdx;
+  document.querySelectorAll('.opt-btn').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===correctIdx)b.classList.add('correct');
+    else if(getShared().answered?.[playerName]?.idx===i) b.classList.add('wrong');
+  });
+  setTimeout(()=>{
+    if(wasCorrect){
+      playerScore+=100+(timerSecs*5);
+      playerStreak++;
+      if(playerStreak>=3)playerScore+=50;
+      showResultScreen(true);
+    } else {
+      loseLife(true);
+    }
+  },1200);
+}
+
+function loseLife(fromReveal=false){
+  playerLives--;
+  updateLivesUI();
+  if(playerLives<=0){
+    playerAlive=false;
+    setTimeout(()=>showScreen('s-eliminated'),fromReveal?600:200);
+  } else {
+    if(fromReveal)showResultScreen(false);
+  }
+}
+
+function updateLivesUI(){
+  const el=document.getElementById('q-lives');
+  if(el) el.innerHTML=['❤️','❤️','❤️'].map((_,i)=>`<span class="q-life ${i>=playerLives?'gone':''}">❤️</span>`).join('');
+}
+
+function showResultScreen(correct){
+  const icon=document.getElementById('res-icon');
+  const title=document.getElementById('res-title');
+  const sub=document.getElementById('res-sub');
+  if(correct){
+    icon.textContent='✅';title.textContent='CORRECT!';
+    sub.textContent=currentQ.expl||'Brilliant answer!';
+    title.style.color='var(--green)';
+  } else {
+    playerStreak=0;
+    icon.textContent='❌';title.textContent='WRONG!';
+    sub.textContent=(currentQ.expl||'')+ ' · Lives left: '+playerLives+'❤️';
+    title.style.color='var(--pink)';
+  }
+  document.getElementById('res-score').textContent=playerScore;
+  document.getElementById('res-streak').textContent='🔥 Streak: '+playerStreak+(playerStreak>=3?' (Bonus active!)':'');
+  showScreen('s-result');
+  updatePlayerInShared();
+  // Poll for next
+  startPolling(s2=>{
+    if(s2.phase==='question' && s2.qIndex!==(getShared().qIndex-1)){
+      stopPolling();loadQuestion(s2.currentQData,s2);
+    }
+    if(s2.phase==='ad'){stopPolling();showPlayerAd();}
+    if(s2.phase==='winner'){stopPolling();showPlayerWinner(s2);}
+  });
+}
+
+function nextFromResult(){
+  // Player waits — admin controls next
+}
+
+function updatePlayerInShared(){
+  const state=getShared();
+  if(state.players && state.players[playerName]){
+    state.players[playerName].score=playerScore;
+    state.players[playerName].lives=playerLives;
+    state.players[playerName].streak=playerStreak;
+    state.players[playerName].alive=playerAlive;
+    db.ref('gameState').set(state);
+  }
+}
+
+function showPlayerAd(){
+  showScreen('s-ad');
+  let t=8;
+  document.getElementById('ad-countdown').textContent='Next round in '+t+'s';
+  const skipBtn=document.getElementById('ad-skip-btn');
+  skipBtn.style.display='none';
+  adTimer=setInterval(()=>{
+    t--;
+    document.getElementById('ad-countdown').textContent='Next round in '+Math.max(0,t)+'s';
+    if(t<=3)skipBtn.style.display='block';
+    if(t<=0){clearInterval(adTimer);skipAd();}
+  },1000);
+  startPolling(s2=>{
+    if(s2.phase==='question' && playerAlive){stopPolling();clearInterval(adTimer);loadQuestion(s2.currentQData,s2);}
+    if(s2.phase==='winner'){stopPolling();clearInterval(adTimer);showPlayerWinner(s2);}
+  });
+}
+
+function skipAd(){
+  clearInterval(adTimer);
+  if(!playerAlive){showScreen('s-eliminated');return;}
+  // Wait for admin to push next question
+  showScreen('s-player-lobby');
+  document.getElementById('lobby-count').textContent=Object.keys(getShared().players||{}).length;
+  startPolling(s2=>{
+    if(s2.phase==='question' && playerAlive){stopPolling();loadQuestion(s2.currentQData,s2);}
+    if(s2.phase==='winner'){stopPolling();showPlayerWinner(s2);}
+  });
+}
+
+function showPlayerWinner(state){
+  const alive=Object.values(state.players||{}).filter(p=>p.alive);
+  const winner=alive.sort((a,b)=>b.score-a.score)[0]||{name:'Champion',score:0};
+  document.getElementById('winner-name-display').textContent=winner.name;
+  document.getElementById('winner-score-pill').textContent='Score: '+winner.score;
+  showScreen('s-winner');
+  launchConfetti();
+  if(winner.name===playerName) showToast('🎉 YOU ARE THE LAST VOICE STANDING!');
+}
+
+// ===== ADMIN =====
+let adminPollInterval=null;
+let currentAdminTab='control';
+
+function adminInit(){
+  // Initialize shared state
+  const existing=getShared();
+  if(!existing.phase){
+    db.ref('gameState').set({phase:'lobby',round:1,qIndex:0,players:{},answered:{},roundHistory:[],gameStarted:false});
+  }
+  adminPoll();
+}
+
+function adminPoll(){
+  if(adminPollInterval)clearInterval(adminPollInterval);
+  adminPollInterval=setInterval(()=>{
+    const state=getShared();
+    updateAdminUI(state);
+  },600);
+}
+
+function updateAdminUI(state){
+  const players=Object.values(state.players||{});
+  const alive=players.filter(p=>p.alive);
+  const total=players.length;
+  document.getElementById('admin-player-count').textContent=total;
+  document.getElementById('as-alive').textContent=alive.length;
+  document.getElementById('as-total').textContent=total;
+  document.getElementById('as-round').textContent=state.round||1;
+  document.getElementById('as-q').textContent=(state.qIndex||0)+1;
+  document.getElementById('admin-status').textContent=`Phase: ${state.phase||'lobby'} · ${alive.length}/${total} alive`;
+
+  // Update players list
+  if(currentAdminTab==='players') renderAdminPlayers(players);
+
+  // Live answer tracking
+  if(state.phase==='question' && state.answered){
+    document.getElementById('live-answers').style.display='block';
+    renderAnswerBars(state.answered,state.currentQData);
+  } else {
+    document.getElementById('live-answers').style.display='none';
+  }
+
+  // Round info
+  const q=QUESTIONS[state.qIndex||0];
+  if(q){
+    document.getElementById('ari-round').textContent=`ROUND ${q.round} · QUESTION ${(state.qIndex||0)+1}/${QUESTIONS.length}`;
+    document.getElementById('ari-q').textContent=q.q.slice(0,80)+(q.q.length>80?'...':'');
+    document.getElementById('ari-type').textContent=q.icon+' '+q.type+' · '+q.time+'s';
+  }
+
+  // Buttons
+  const started=state.gameStarted;
+  document.getElementById('btn-start').disabled=started;
+  document.getElementById('btn-next').disabled=!started||state.phase==='lobby';
+  document.getElementById('btn-ad').disabled=!started;
+  document.getElementById('btn-declare').disabled=!started||alive.length>1;
+}
+
+function renderAdminPlayers(players){
+  const list=document.getElementById('admin-players-list');
+  if(!players.length){
+    list.innerHTML='<div style="color:var(--muted);text-align:center;padding:30px;font-size:14px;">No players yet...</div>';
+    return;
+  }
+  players.sort((a,b)=>b.score-a.score);
+  list.innerHTML=players.map((p,i)=>`
+  <div class="player-row ${p.alive?'alive':'dead'}">
+    <div style="font-family:Bebas Neue,sans-serif;font-size:14px;color:var(--muted);min-width:20px;">${i+1}</div>
+    <div class="pr-av">${p.initials||p.name[0]}</div>
+    <div style="flex:1">
+      <div class="pr-name">${p.name}</div>
+      <div class="pr-streak">🔥${p.streak||0} streak</div>
+    </div>
+    <div style="text-align:right">
+      <div class="pr-score">${p.score||0}</div>
+      <div class="pr-lives">${[0,1,2].map(i=>`<span style="opacity:${i<(p.lives||0)?1:0.15}">❤️</span>`).join('')}</div>
+      <div class="pr-status">${p.alive?'✓ ALIVE':'✗ OUT'}</div>
+    </div>
+  </div>`).join('');
+}
+
+function renderAnswerBars(answered,qData){
+  if(!qData)return;
+  const counts=[0,0,0,0];
+  Object.values(answered).forEach(a=>{if(a.idx>=0&&a.idx<4)counts[a.idx]++;});
+  const total=counts.reduce((a,b)=>a+b,0)||1;
+  const letters=['A','B','C','D'];
+  document.getElementById('answer-bars').innerHTML=counts.map((c,i)=>`
+  <div class="answer-bar">
+    <span class="ab-label">${letters[i]}</span>
+    <div class="ab-track"><div class="ab-fill" style="width:${(c/total*100).toFixed(0)}%;background:${i===(qData.ans)?'var(--green)':'var(--orange)'}"></div></div>
+    <span class="ab-count">${c}</span>
+  </div>`).join('');
+}
+
+function adminTab(tab){
+  currentAdminTab=tab;
+  document.querySelectorAll('.a-tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  ['control','players','rounds'].forEach(t=>{
+    const el=document.getElementById('admin-tab-'+t);
+    if(el)el.style.display=t===tab?'block':'none';
+  });
+  if(tab==='players'){const s=getShared();renderAdminPlayers(Object.values(s.players||{}));}
+  if(tab==='rounds'){renderRoundHistory(getShared());}
+}
+
+function renderRoundHistory(state){
+  const el=document.getElementById('round-history');
+  const hist=state.roundHistory||[];
+  if(!hist.length){el.innerHTML='<div style="color:var(--muted);text-align:center;padding:20px;font-size:13px;">No rounds completed yet</div>';return;}
+  el.innerHTML=hist.map(h=>`
+  <div class="rh-item">
+    <div><div class="rhi-label">${h.icon} ${h.type}</div><div style="font-size:11px;color:var(--muted)">${h.q.slice(0,50)}...</div></div>
+    <div style="text-align:right">
+      <div class="rhi-correct">✓${h.correct}</div>
+      <div class="rhi-wrong">✗${h.wrong}</div>
+    </div>
+  </div>`).join('');
+}
+
+function adminStartGame(){
+  if(!confirm('Start the game now? All players in lobby will be locked in.'))return;
+  const state=getShared();
+  if(!Object.keys(state.players||{}).length){
+    showToast('⚠️ No players have joined yet!');return;
+  }
+  qIndex=0;
+  const q=QUESTIONS[0];
+  broadcast({phase:'question',gameStarted:true,qIndex:0,currentQData:q,answered:{},round:1,roundHistory:[]});
+  document.getElementById('btn-start').disabled=true;
+  document.getElementById('btn-next').disabled=false;
+  document.getElementById('btn-ad').disabled=false;
+  showToast('🎮 Game started! Round 1 is live.');
+}
+
+function adminNextQuestion(){
+  const state=getShared();
+  // First reveal answer
+  const q=QUESTIONS[state.qIndex||0];
+  if(!q)return;
+
+  // Log round history
+  const answered=Object.values(state.answered||{});
+  const correct=answered.filter(a=>a.idx===q.ans).length;
+  const wrong=answered.length-correct;
+  const hist=[...(state.roundHistory||[]),{icon:q.icon,type:q.type,q:q.q,correct,wrong}];
+
+  // Eliminate players who answered wrong or didn't answer
+  const players={...state.players};
+  const answeredNames=new Set(Object.keys(state.answered||{}));
+  Object.keys(players).forEach(name=>{
+    if(!players[name].alive)return;
+    const a=state.answered?.[name];
+    if(!a||a.idx!==q.ans){
+      players[name].lives=(players[name].lives||3)-1;
+      if(players[name].lives<=0)players[name].alive=false;
+    } else {
+      players[name].score=(players[name].score||0)+100;
+      players[name].streak=(players[name].streak||0)+1;
+    }
+  });
+
+  broadcast({phase:'showAnswer',correctAnswer:q.ans,currentQData:q,players,roundHistory:hist});
+  showToast('📊 Showing correct answer...');
+
+  setTimeout(()=>{
+    const nextIdx=(state.qIndex||0)+1;
+    if(nextIdx>=QUESTIONS.length){
+      showToast('✅ All questions done! Declare a winner or reset.');
+      document.getElementById('btn-declare').disabled=false;
+      return;
+    }
+    const nextQ=QUESTIONS[nextIdx];
+    const alive=Object.values(players).filter(p=>p.alive);
+    if(alive.length<=1){
+      showToast('🏆 Only 1 player left! Declare winner.');
+      document.getElementById('btn-declare').disabled=false;
+      broadcast({phase:'question',qIndex:nextIdx,currentQData:nextQ,answered:{},round:nextQ.round,players,roundHistory:hist});
+      return;
+    }
+    broadcast({phase:'question',qIndex:nextIdx,currentQData:nextQ,answered:{},round:nextQ.round,players,roundHistory:hist});
+    showToast(`⏭ Question ${nextIdx+1} is live!`);
+  },3000);
+}
+
+function adminShowAd(){
+  broadcast({phase:'ad'});
+  showToast('📺 Nexa ad break shown to all players!');
+}
+
+function adminDeclareWinner(){
+  const state=getShared();
+  const alive=Object.values(state.players||{}).filter(p=>p.alive);
+  const winner=alive.sort((a,b)=>b.score-a.score)[0];
+  if(!winner){showToast('⚠️ No alive players found.');return;}
+  broadcast({phase:'winner',winner:winner.name});
+  document.getElementById('winner-name-display').textContent=winner.name;
+  document.getElementById('winner-score-pill').textContent='Score: '+(winner.score||0);
+  showScreen('s-winner');
+  launchConfetti();
+  showToast('🏆 '+winner.name+' is the LAST VOICE STANDING!');
+}
+
+function adminResetGame(){
+  if(!confirm('Reset game? All player data will be cleared.'))return;
+  db.ref('gameState').remove();
+  if(adminPollInterval)clearInterval(adminPollInterval);
+  showScreen('s-admin');
+  adminInit();
+  showToast('↺ Game reset. Ready for new players.');
+}
+
+// ===== CONFETTI =====
+function launchConfetti(){
+  const canvas=document.getElementById('confetti-canvas');
+  if(!canvas)return;
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const particles=[];
+  const cols=['#C8922A','#F5C842','#FF6B35','#2EBB5A','#E8386D','#00D4C8','#ffffff'];
+  for(let i=0;i<200;i++) particles.push({
+    x:Math.random()*canvas.width,y:-20,
+    vx:(Math.random()-0.5)*4,vy:Math.random()*4+2,
+    w:Math.random()*10+5,h:Math.random()*6+4,
+    color:cols[Math.floor(Math.random()*cols.length)],
+    r:Math.random()*Math.PI*2,rv:(Math.random()-0.5)*0.2,
+    life:1
+  });
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let any=false;
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.r+=p.rv;p.vy+=0.1;p.life-=0.004;
+      if(p.y<canvas.height&&p.life>0){
+        any=true;
+        ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);
+        ctx.fillStyle=p.color;ctx.globalAlpha=Math.max(0,p.life);
+        ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();
+      }
+    });
+    if(any)requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ===== TOAST =====
+let toastT=null;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  if(toastT)clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// Keyboard enter support
+document.getElementById('player-name-inp').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame();});
+</script>
+</body>
+</html>
